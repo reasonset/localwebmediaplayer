@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Local Web Media Player</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <link type="text/css" rel="stylesheet" href="/theme.css" />
+    <script src="/main.js" defer type="module"></script>
+  </head>
+  <body>
+    <div id="Browser">
+      <div id="Control">
+        <input type="text" size="48" id="CurrentPath" readonly style="max-width: 100%;" />
+        <div class="ctlbtn" id="UpParent">..</div>
+        <div class="ctlbtn" id="PlayAllAudio">Play Audio</div>
+        <div class="ctlbtn" id="PlayAllVideos">Play Video</div>
+        <div class="ctlbtn" id="ShowPlayer">Show Player</div>
+      </div>
+      <div id="FileList">
+      </div>
+    </div>
+    <div id="Player" style="display: none">
+      <div id="PlayControl">
+        <div class="ctlbtn" id="BackToBrowser">← Back to Browser</div>
+      </div>
+      <div id="PlayerContainer">
+        <div id="MediaPlayer"></div>
+      </div>
+      <div id="PlayList"></div>
+    </div>
+    <div id="MsgBox" class="msgtrans">Msg</div>
+  </body>
+</html>

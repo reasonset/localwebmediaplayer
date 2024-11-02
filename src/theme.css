@@ -1,0 +1,101 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#Control {
+  background-color: #fff;
+  border: 5px solid #5e8dcf;
+  padding: 6px;
+  position: sticky;
+  inset: 0px;
+}
+
+.ctlbtn {
+  display: inline-block;
+  border: 3px solid #5e8dcf;
+  border-radius: 6px;
+  padding-left: 0.85em;
+  padding-right: 0.85em;
+  cursor: pointer;
+  font-size: 120%;
+  font-weight: bold;
+}
+
+#CurrentPath {
+  display: block;
+  border: 3px solid #5e8dcf;
+  border-radius: 6px;
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+  font-family: monospace;
+  font-size: 120%;
+  margin-bottom: 8px;
+}
+
+#FileList {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+#FileList .file_item {
+  flex: 0 1 200px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.file_item img {
+  height: 120px;
+  width: 120px;
+}
+
+#Player video {
+  max-width: 100%;
+  max-height: 70vh;
+  width: 100%;
+  margin: auto;
+}
+
+#PlayList {
+  margin: 10px;
+  padding: 3px;
+  border: 3px solid #5e8dcf;
+  border-radius: 6px;
+  max-height: 150px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+#PlayList > div {
+  border-bottom: 1px solid #5e8dcf;
+}
+
+#PlayList .current_playitem {
+  background-color: #b1cff9;
+}
+
+#PlayList .current_playitem, #PlayList .noncurrent_playitem {
+  cursor: pointer;
+}
+
+#MsgBox {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background-color: #f7d8ea;
+  padding: 0.55em;
+  border-radius: 4px;
+}
+
+.msgshow {
+  opacity: 1;
+}
+
+.msgtrans {
+  opacity: 0;
+  transition: opacity 3s ease-in;
+}
+
+.filename, #MsgBox div {
+  word-break: break-all;
+}
