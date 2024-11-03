@@ -42,6 +42,7 @@ It is not intended to be published on the Internet and such activities are dange
 
 * lighttpd
 * Ruby >= 3.2
+* OS uses UTF-8 based filename
 
 ## Install
 
@@ -49,7 +50,7 @@ It is not intended to be published on the Internet and such activities are dange
 
 ## Configuration
 
-Copy `sample.lighttpd.conf` and edit it.
+Copy `sample/lighttpd.conf` and edit it.
 
 * `server.username` to your user name.
 * `server.groupname` to your user group name.
@@ -59,5 +60,7 @@ Copy `sample.lighttpd.conf` and edit it.
 
 ## Usage
 
-* Start server with `MEDIA_ROOT="</path/to/your/media/library/root>" lighttpd -D -f <path/to/config/file>`
+* Start server with `MEDIA_ROOT="</path/to/your/media/library/root>" REPOSRC="</path/to/repository>/src" lighttpd -D -f <path/to/config/file>`
 * Access started server with web browser
+
+See `sample/lwmp.bash`.

@@ -3,11 +3,19 @@ require 'cgi'
 require 'json'
 
 module DirList
+  class BadRequest < StandardError
+  end
+
   MEDIA_EXT_VID = %w:.mp4 .mkv .mov .webm .ogv:
   MEDIA_EXT_AUD = %w:.mp3 .ogg .oga .opus .m4a .aac .flac .wav:
 
   def dir path
     path = nil if path && path.empty?
+    STDERR.puts path
+    if path && (path =~ %r!(?:^|/)\.\.(?:$|/)! || path[0] == "/")
+      raise BadRequest
+    end
+
     dirpath = path ? File.join(@root, path) : @root
     files = {
       "directory" => [],
@@ -62,6 +70,10 @@ class MediaPlayer
     puts "Content-Type: application/json; charset=utf-8"
     puts
     puts JSON.dump(val)
+  rescue BadRequest
+    puts "Status: 400"
+    puts "Content-Type: text/plain"
+    puts
   end
 end
 
