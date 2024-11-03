@@ -2,6 +2,9 @@
 require 'cgi'
 require 'json'
 
+Encoding.default_external = "UTF-8"
+Encoding.default_internal = "UTF-8"
+
 module DirList
   class BadRequest < StandardError
   end
@@ -11,7 +14,6 @@ module DirList
 
   def dir path
     path = nil if path && path.empty?
-    STDERR.puts path
     if path && (path =~ %r!(?:^|/)\.\.(?:$|/)! || path[0] == "/")
       raise BadRequest
     end
@@ -45,9 +47,28 @@ module DirList
             "path" => (path ? File.join(path, fn) : fn),
             "ext" => ext
           })
+        elsif ext.downcase == ".m3u"
+          begin
+            list = File.read(path ? File.join(@root, path, fn) : File.join(@root, fn)).each_line.reject {|i| i =~ /^\s*#/ || i =~ /^\s*$/ }.map {|i| i.chomp }
+
+            unless list.any? {|i| i[0] == "/" || i =~ %r!(?:^|/)\.\.(?:$|/)! }
+              files["file"].push({
+                "type" => "list",
+                "path" => (path ? File.join(path, fn) : fn),
+                "list" => list.map {|i| path ? File.join(path, i) : i }
+              })
+            end
+          rescue
+            # Invalid playlist item
+            nil
+          end
         end
       end
     end
+
+    # Re-sorting with UTF-8 Filename
+    files["directory"].sort_by! {|i| File.basename i["path"] }
+    files["file"].sort_by! {|i| File.basename i["path"] }
 
     files
   end

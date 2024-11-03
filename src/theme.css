@@ -22,6 +22,10 @@ body {
   font-weight: bold;
 }
 
+.ctlbtn img {
+  height: 1em;
+}
+
 #CurrentPath {
   display: block;
   border: 3px solid #5e8dcf;
@@ -56,8 +60,22 @@ body {
   margin: auto;
 }
 
+#Player audio {
+  width: 100%;
+}
+
+#PlayListControl {
+  margin: 10px 10px 0px 10px;
+}
+
+#PlayListControl img {
+  height: 1.8em;
+  margin: auto 0.25em;
+  cursor: pointer;
+}
+
 #PlayList {
-  margin: 10px;
+  margin: 3px 10px 10px 10px;
   padding: 3px;
   border: 3px solid #5e8dcf;
   border-radius: 6px;

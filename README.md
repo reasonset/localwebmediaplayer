@@ -33,6 +33,8 @@ If an item remains in the playlist, it will automatically start playing the next
 
 Clicking on an item in the playlist starts playback of that item.
 
+This software supports `.m3u` playlist *only* has relative path.
+
 ## Caution
 
 This software is intended to be used to play media from other devices within a LAN.
@@ -60,7 +62,9 @@ Copy `sample/lighttpd.conf` and edit it.
 
 ## Usage
 
-* Start server with `MEDIA_ROOT="</path/to/your/media/library/root>" REPOSRC="</path/to/repository>/src" lighttpd -D -f <path/to/config/file>`
+* Start server with `MEDIA_ROOT="</path/to/your/media/library/root>/" REPOSRC="</path/to/repository>/src" lighttpd -D -f <path/to/config/file>`
 * Access started server with web browser
 
 See `sample/lwmp.bash`.
+
+`MEDIA_ROOT` needs `/` at the end.

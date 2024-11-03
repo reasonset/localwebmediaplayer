@@ -7,6 +7,6 @@ declare lighttpd_conf=$HOME/.config/reasonset/lwmp/lighttpd.conf
 export REPOSRC=$HOME/.local/opt/localwebmediaplayer/src
 
 # Media file library directory
-export MEDIA_ROOT=$(xdg-user-dir VIDEOS)
+export MEDIA_ROOT=$(xdg-user-dir VIDEOS)/
 
 lighttpd -D -f "$lighttpd_conf"

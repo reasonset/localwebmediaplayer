@@ -10,21 +10,22 @@
     <div id="Browser">
       <div id="Control">
         <input type="text" size="48" id="CurrentPath" readonly style="max-width: 100%;" />
-        <div class="ctlbtn" id="UpParent">..</div>
-        <div class="ctlbtn" id="PlayAllAudio">Play Audio</div>
-        <div class="ctlbtn" id="PlayAllVideos">Play Video</div>
-        <div class="ctlbtn" id="ShowPlayer">Show Player</div>
+        <div class="ctlbtn" id="UpParent"><img src="/img/arrow-up.svg" /> ..</div>
+        <div class="ctlbtn" id="PlayAllAudio"><img src="/img/music.svg" /> Play Audio</div>
+        <div class="ctlbtn" id="PlayAllVideos"><img src="/img/video.svg" /> Play Video</div>
+        <div class="ctlbtn" id="ShowPlayer"><img src="/img/play.svg" /> Show Player</div>
       </div>
       <div id="FileList">
       </div>
     </div>
     <div id="Player" style="display: none">
       <div id="PlayControl">
-        <div class="ctlbtn" id="BackToBrowser">← Back to Browser</div>
+        <div class="ctlbtn" id="BackToBrowser"><img src="/img/arrow-left-circle.svg" /> Back to Browser</div>
       </div>
       <div id="PlayerContainer">
         <div id="MediaPlayer"></div>
       </div>
+      <div id="PlayListControl"><img src="/img/arrow-left-circle.svg" id="PlaylistPrev" /><img src="/img/arrow-right-circle.svg" id="PlaylistNext" /></div>
       <div id="PlayList"></div>
     </div>
     <div id="MsgBox" class="msgtrans">Msg</div>

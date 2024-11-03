@@ -47,6 +47,7 @@ const load_browser = async function(path) {
     const fi = document.createElement("div")
     fi.className = "file_item"
     fi.dataset.filePath = i.path
+    fi.playlist = i.list
     fi.dataset.mediaType = i.type
     const fii =  document.createElement("div")
     fii.className = i.type
@@ -61,7 +62,7 @@ const load_browser = async function(path) {
     fi.appendChild(fin)
 
     fi.addEventListener("click", e => {
-      single_play(e.currentTarget.dataset.filePath, i.type)
+      file_click(e.currentTarget, i.type)
     })
 
     filelist_div.appendChild(fi)
@@ -74,14 +75,27 @@ const load_browser = async function(path) {
   l.replaceWith(filelist_div)
 }
 
-const set_playlist = function(pathes) {
+const get_type_from_ext = function(path) {
+  const ext = path.replace(/.*\./, "")
+  if (["mp4", "mkv", "mov", "webm", "ogv"].includes(ext)) {
+    return "video"
+  } else if (["mp3", "ogg", "oga", "opus", "m4a", "aac", "flac", "wav"].includes(ext)) {
+    return "music"
+  } else {
+    return "unknown"
+  }
+}
+
+const set_playlist = function(type, pathes) {
   playlist = []
   const ple = document.createElement("div")
   ple.id = "PlayList"
   for (let i=0; i < pathes.length; i++) {
+    let acttype = type || get_type_from_ext(pathes[i].replace(/.*\./, ""))
     playlist.push({
       path: pathes[i],
-      index: i
+      index: i,
+      type: acttype
     })
     const li = document.createElement("div")
     li.dataset.filePath = pathes[i]
@@ -91,7 +105,16 @@ const set_playlist = function(pathes) {
     ple.appendChild(li)
 
     li.addEventListener("click", e => {
-      load_player(currentState.mediatype, playlist[i])
+      if (!type) {
+        if (acttype === "video" || acttype === "music") {
+          load_player(playlist[i])
+        } else {
+          // skip playlist
+          return
+        }
+      } else {
+        load_player(playlist[i])
+      }
     })
   }
 
@@ -99,29 +122,36 @@ const set_playlist = function(pathes) {
   playlist_div.replaceWith(ple)
 }
 
-const load_player = function(type, path) {
+const load_player = function(playlist_item) {
+  const type = playlist_item.type
+  if (type === "unknown" ) {return}
   let media_div
-  if (type === "music") {
-    media_div = document.createElement("audio")
-    media_div.id = "MediaPlayer"
-    media_div.src = "/media/" + path.path
-    media_div.controls = true
-    media_div.preload = "auto"
-    media_div.autoplay = "true"
-  } else if (type === "video") {
-    media_div = document.createElement("video")
-    media_div.id = "MediaPlayer"
-    media_div.src = "/media/" + path.path
-    media_div.controls = true
-    media_div.preload = "auto"
-    media_div.autoplay = "true"
+  const sametype = currentState.mediatype == type
+  if (sametype) {
+    media_div = document.getElementById("MediaPlayer")
+  } else {
+    if (type === "music") {
+      media_div = document.createElement("audio")
+      media_div.id = "MediaPlayer"
+      media_div.src = "/media/" + playlist_item.path
+      media_div.controls = true
+      media_div.preload = "auto"
+      media_div.autoplay = "true"
+    } else if (type === "video") {
+      media_div = document.createElement("video")
+      media_div.id = "MediaPlayer"
+      media_div.src = "/media/" + playlist_item.path
+      media_div.controls = true
+      media_div.preload = "auto"
+      media_div.autoplay = "true"
+    }
   }
-  currentState.playlist_index = path.index
+  currentState.playlist_index = playlist_item.index
   currentState.mediatype = type
 
   const listitems = document.getElementById("PlayList").getElementsByTagName("div")
   for (let i=0; i < listitems.length; i++) {
-    if (i === path.index) {
+    if (i === playlist_item.index) {
       listitems[i].className = "current_playitem"
     } else {
       listitems[i].className = "noncurrent_playitem"
@@ -129,18 +159,32 @@ const load_player = function(type, path) {
   }
 
   media_div.addEventListener("ended", e => {
-    if (path.index < playlist.length) {
-      load_player(type, playlist[path.index + 1])
+    if (playlist_item.index < playlist.length) {
+      load_player(playlist[playlist_item.index + 1])
     }
   })
 
-  const player_div = document.getElementById("MediaPlayer")
-  player_div.replaceWith(media_div)
+  if (sametype) {
+    media_div.src = "/media/" + playlist_item.path
+  } else {
+    const player_div = document.getElementById("MediaPlayer")
+    player_div.replaceWith(media_div)
+  }
+}
+
+const file_click = function(target, type) {
+  if (type === "list") {
+    set_playlist(null, target.playlist)
+    load_player(playlist[0])
+    switch_player()
+  } else {
+    single_play(target.dataset.filePath, type)
+  }
 }
 
 const single_play = function(path, type) {
-  set_playlist([path])
-  load_player(type, playlist[0])
+  set_playlist(type, [path])
+  load_player(playlist[0])
   switch_player()
 }
 
@@ -155,8 +199,8 @@ const play_all_videos = function() {
     msg_show("No video on this directory.")
     return
   }
-  set_playlist(list)
-  load_player("video", playlist[0])
+  set_playlist("video", list)
+  load_player(playlist[0])
   switch_player()
 }
 
@@ -171,9 +215,21 @@ const play_all_audio = function() {
     msg_show("No audio on this directory.")
     return
   }
-  set_playlist(list)
-  load_player("music", playlist[0])
+  set_playlist("music", list)
+  load_player(playlist[0])
   switch_player()
+}
+
+const playlist_prev = function(e) {
+  if (currentState.playlist_index > 0) {
+    load_player(playlist[currentState.playlist_index - 1])
+  }
+}
+
+const playlist_next = function(e) {
+  if (currentState.playlist_index < playlist.length) {
+    load_player(playlist[currentState.playlist_index + 1])
+  }
 }
 
 const switch_player = function() {
@@ -206,6 +262,9 @@ document.getElementById("ShowPlayer").addEventListener("click", e => { switch_pl
 document.getElementById("BackToBrowser").addEventListener("click", e => { switch_browser() })
 document.getElementById("PlayAllVideos").addEventListener("click", e => { play_all_videos() })
 document.getElementById("PlayAllAudio").addEventListener("click", e => { play_all_audio() })
+
+document.getElementById("PlaylistNext").addEventListener("click", playlist_next)
+document.getElementById("PlaylistPrev").addEventListener("click", playlist_prev)
 
 const upelem = document.getElementById("UpParent")
 upelem.addEventListener("click", e => {
