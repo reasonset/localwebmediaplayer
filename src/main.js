@@ -4,7 +4,9 @@ var playlist = []
 var currentState = {
   filelist: [],
   playlist_index: -1,
-  mediatype: null
+  mediatype: null,
+  path: null,
+  scroll_position: {}
 }
 
 const load_browser = async function(path) {
@@ -71,8 +73,19 @@ const load_browser = async function(path) {
   const pathview = document.getElementById("CurrentPath")
   pathview.value = path
 
+  if (currentState.path) {
+    const current_position = window.scrollY
+    currentState.scroll_position[currentState.path] = current_position
+  }
+
   const l = document.getElementById("FileList")
   l.replaceWith(filelist_div)
+
+  if (currentState.scroll_position[path] != null) {
+    window.scrollTo({top: currentState.scroll_position[path]})
+  }
+
+  currentState.path = path
 }
 
 const get_type_from_ext = function(path) {
@@ -271,4 +284,8 @@ upelem.addEventListener("click", e => {
   const pathview = document.getElementById("CurrentPath")
   const path = pathview.value.replace(/\/[^/]*$/, "")
   load_browser(path)
+})
+
+window.addEventListener("resize", e => {
+  currentState.scroll_position = {}
 })

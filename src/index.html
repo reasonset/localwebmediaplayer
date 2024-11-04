@@ -10,10 +10,12 @@
     <div id="Browser">
       <div id="Control">
         <input type="text" size="48" id="CurrentPath" readonly style="max-width: 100%;" />
-        <div class="ctlbtn" id="UpParent"><img src="/img/arrow-up.svg" /> ..</div>
-        <div class="ctlbtn" id="PlayAllAudio"><img src="/img/music.svg" /> Play Audio</div>
-        <div class="ctlbtn" id="PlayAllVideos"><img src="/img/video.svg" /> Play Video</div>
-        <div class="ctlbtn" id="ShowPlayer"><img src="/img/play.svg" /> Show Player</div>
+        <div id="ControlButtonContainer">
+          <div class="ctlbtn" id="UpParent"><img src="/img/arrow-up.svg" /><span class="ctlbtnlabel"> ..</span></div>
+          <div class="ctlbtn" id="PlayAllAudio"><img src="/img/music.svg" /><span class="ctlbtnlabel"> Play Audio</span></div>
+          <div class="ctlbtn" id="PlayAllVideos"><img src="/img/video.svg" /><span class="ctlbtnlabel"> Play Video</span></div>
+          <div class="ctlbtn" id="ShowPlayer"><img src="/img/play.svg" /><span class="ctlbtnlabel"> Show Player</span></div>
+        </div>
       </div>
       <div id="FileList">
       </div>

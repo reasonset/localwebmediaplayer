@@ -20,6 +20,7 @@ body {
   cursor: pointer;
   font-size: 120%;
   font-weight: bold;
+  margin: 2px auto;
 }
 
 .ctlbtn img {
@@ -116,4 +117,25 @@ body {
 
 .filename, #MsgBox div {
   word-break: break-all;
+}
+
+@media screen and (max-width: 600px) {
+  #FileList .file_item {
+    flex: 1 1 120px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .file_item img {
+    height: 100px;
+    width: 100px;
+  }
+
+  .filename {
+    font-size: 90%;
+  }
+
+  .ctlbtnlabel {
+    display: none;
+  }
 }
