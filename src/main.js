@@ -6,7 +6,9 @@ var currentState = {
   playlist_index: -1,
   mediatype: null,
   path: null,
-  scroll_position: {}
+  scroll_position: {},
+  viewportX: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+  cover: null
 }
 
 const load_browser = async function(path) {
@@ -86,6 +88,8 @@ const load_browser = async function(path) {
   }
 
   currentState.path = path
+
+  currentState.cover = result.cover
 }
 
 const get_type_from_ext = function(path) {
@@ -120,13 +124,13 @@ const set_playlist = function(type, pathes) {
     li.addEventListener("click", e => {
       if (!type) {
         if (acttype === "video" || acttype === "music") {
-          load_player(playlist[i])
+          load_player(playlist[i], {keep_cover: true})
         } else {
           // skip playlist
           return
         }
       } else {
-        load_player(playlist[i])
+        load_player(playlist[i], {keep_cover: true})
       }
     })
   }
@@ -135,7 +139,8 @@ const set_playlist = function(type, pathes) {
   playlist_div.replaceWith(ple)
 }
 
-const load_player = function(playlist_item) {
+const load_player = function(playlist_item, options={}) {
+  console.log(options)
   const type = playlist_item.type
   if (type === "unknown" ) {return}
   let media_div
@@ -150,6 +155,16 @@ const load_player = function(playlist_item) {
       media_div.controls = true
       media_div.preload = "auto"
       media_div.autoplay = "true"
+
+      // Set cover
+      if (options.cover) {
+        const imgdiv = document.createElement("div")
+        imgdiv.id = "CoverImage"
+        const coverimg = document.createElement("img")
+        coverimg.src = "/media/" + options.cover
+        imgdiv.appendChild(coverimg)
+        document.getElementById("CoverImage").replaceWith(imgdiv)
+      }
     } else if (type === "video") {
       media_div = document.createElement("video")
       media_div.id = "MediaPlayer"
@@ -162,6 +177,13 @@ const load_player = function(playlist_item) {
   currentState.playlist_index = playlist_item.index
   currentState.mediatype = type
 
+  // Reset cover
+  if (!options.keep_cover && !options.cover) {
+    const imgdiv = document.createElement("div")
+    imgdiv.id = "CoverImage"
+    document.getElementById("CoverImage").replaceWith(imgdiv)
+  }
+
   const listitems = document.getElementById("PlayList").getElementsByTagName("div")
   for (let i=0; i < listitems.length; i++) {
     if (i === playlist_item.index) {
@@ -173,7 +195,7 @@ const load_player = function(playlist_item) {
 
   media_div.addEventListener("ended", e => {
     if (playlist_item.index < playlist.length) {
-      load_player(playlist[playlist_item.index + 1])
+      load_player(playlist[playlist_item.index + 1], {keep_cover: true})
     }
   })
 
@@ -229,19 +251,19 @@ const play_all_audio = function() {
     return
   }
   set_playlist("music", list)
-  load_player(playlist[0])
+  load_player(playlist[0], {cover: currentState.cover})
   switch_player()
 }
 
 const playlist_prev = function(e) {
   if (currentState.playlist_index > 0) {
-    load_player(playlist[currentState.playlist_index - 1])
+    load_player(playlist[currentState.playlist_index - 1], {keep_cover: true})
   }
 }
 
 const playlist_next = function(e) {
   if (currentState.playlist_index < playlist.length) {
-    load_player(playlist[currentState.playlist_index + 1])
+    load_player(playlist[currentState.playlist_index + 1], {keep_cover: true})
   }
 }
 
@@ -268,7 +290,8 @@ const msg_show = function(text) {
 }
 
 window.addEventListener("load", e => {
-  load_browser(".")
+  let initial_path = window.location.search.replace(/^\?/, "") || ""
+  load_browser(initial_path)
 })
 
 document.getElementById("ShowPlayer").addEventListener("click", e => { switch_player() })
@@ -283,9 +306,13 @@ const upelem = document.getElementById("UpParent")
 upelem.addEventListener("click", e => {
   const pathview = document.getElementById("CurrentPath")
   const path = pathview.value.replace(/\/[^/]*$/, "")
-  load_browser(path)
+  load_browser(path.includes("/") ? path : "")
 })
 
 window.addEventListener("resize", e => {
-  currentState.scroll_position = {}
+  const vpx = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+  if (vpx != currentState.viewportX) {
+    currentState.scroll_position = {}
+    currentState.viewportX = vpx
+  }
 })

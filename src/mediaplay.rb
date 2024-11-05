@@ -22,6 +22,7 @@ module DirList
     files = {
       "directory" => [],
       "file" => [],
+      "cover" => nil
     }
     Dir.children(dirpath).each do |fn|
       fn.force_encoding("UTF-8")
@@ -35,7 +36,9 @@ module DirList
         })
       elsif stat.file?
         ext = File.extname(fn)
-        if MEDIA_EXT_VID.include? ext.downcase
+        if File.fnmatch("{cover,front}.{jpg,png}", fn, File::FNM_EXTGLOB)
+          files["cover"] ||= (path ? File.join(path, fn) : fn)
+        elsif MEDIA_EXT_VID.include? ext.downcase
           files["file"].push({
             "type" => "video",
             "path" => (path ? File.join(path, fn) : fn),

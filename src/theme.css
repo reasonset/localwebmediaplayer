@@ -119,6 +119,16 @@ body {
   word-break: break-all;
 }
 
+#CoverImage {
+  text-align: center;
+}
+
+#CoverImage img {
+  height: 400px;
+  max-width: 100%;
+  max-height: 40vh;
+}
+
 @media screen and (max-width: 600px) {
   #FileList .file_item {
     flex: 1 1 120px;
