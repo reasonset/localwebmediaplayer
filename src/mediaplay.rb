@@ -34,11 +34,11 @@ module DirList
           "type" => "directory",
           "path" => path ? File.join(path, fn) : fn
         })
-      elsif stat.file?
+      elsif File.fnmatch("{cover,front}.{jpg,png}", fn, File::FNM_EXTGLOB)
+        files["cover"] ||= (path ? File.join(path, fn) : fn)
+      elsif stat.file? || File.file?(File.realpath(File.join(dirpath, fn)))
         ext = File.extname(fn)
-        if File.fnmatch("{cover,front}.{jpg,png}", fn, File::FNM_EXTGLOB)
-          files["cover"] ||= (path ? File.join(path, fn) : fn)
-        elsif MEDIA_EXT_VID.include? ext.downcase
+        if MEDIA_EXT_VID.include? ext.downcase
           files["file"].push({
             "type" => "video",
             "path" => (path ? File.join(path, fn) : fn),
