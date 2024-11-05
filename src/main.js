@@ -291,6 +291,7 @@ const msg_show = function(text) {
 
 window.addEventListener("load", e => {
   let initial_path = window.location.search.replace(/^\?/, "") || ""
+  initial_path = decodeURI(initial_path)
   load_browser(initial_path)
 })
 
