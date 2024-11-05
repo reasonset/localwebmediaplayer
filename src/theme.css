@@ -36,6 +36,8 @@ body {
   font-family: monospace;
   font-size: 120%;
   margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #FileList {
