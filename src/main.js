@@ -151,7 +151,7 @@ const load_player = function(playlist_item, options={}) {
     if (type === "music") {
       media_div = document.createElement("audio")
       media_div.id = "MediaPlayer"
-      media_div.src = "/media/" + playlist_item.path
+      media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
       media_div.controls = true
       media_div.preload = "auto"
       media_div.autoplay = "true"
@@ -168,7 +168,7 @@ const load_player = function(playlist_item, options={}) {
     } else if (type === "video") {
       media_div = document.createElement("video")
       media_div.id = "MediaPlayer"
-      media_div.src = "/media/" + playlist_item.path
+      media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
       media_div.controls = true
       media_div.preload = "auto"
       media_div.autoplay = "true"
@@ -200,7 +200,7 @@ const load_player = function(playlist_item, options={}) {
   })
 
   if (sametype) {
-    media_div.src = "/media/" + playlist_item.path
+    media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
   } else {
     const player_div = document.getElementById("MediaPlayer")
     player_div.replaceWith(media_div)
