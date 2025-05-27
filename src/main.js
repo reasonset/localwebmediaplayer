@@ -289,11 +289,16 @@ const msg_show = function(text) {
   window.setTimeout(()=> {box.className = "msgtrans"}, 3000)
 }
 
+/**
+ * Load initial location.
+ */
 window.addEventListener("load", e => {
   let initial_path = window.location.search.replace(/^\?/, "") || ""
-  initial_path = decodeURI(initial_path)
+  initial_path = decodeURIComponent(initial_path)
   load_browser(initial_path)
 })
+
+// Setup navigation button events
 
 document.getElementById("ShowPlayer").addEventListener("click", e => { switch_player() })
 document.getElementById("BackToBrowser").addEventListener("click", e => { switch_browser() })
@@ -310,6 +315,9 @@ upelem.addEventListener("click", e => {
   load_browser(path.includes("/") ? path : "")
 })
 
+//
+
+// Setup resize event
 window.addEventListener("resize", e => {
   const vpx = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
   if (vpx != currentState.viewportX) {
