@@ -151,10 +151,10 @@ const load_player = function(playlist_item, options={}) {
     if (type === "music") {
       media_div = document.createElement("audio")
       media_div.id = "MediaPlayer"
-      media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
+      media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
       media_div.controls = true
       media_div.preload = "auto"
-      media_div.autoplay = "true"
+      media_div.autoplay = "autoplay"
 
       // Set cover
       if (options.cover) {
@@ -168,10 +168,10 @@ const load_player = function(playlist_item, options={}) {
     } else if (type === "video") {
       media_div = document.createElement("video")
       media_div.id = "MediaPlayer"
-      media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
+      media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
       media_div.controls = true
       media_div.preload = "auto"
-      media_div.autoplay = "true"
+      media_div.autoplay = "autoplay"
     }
   }
   currentState.playlist_index = playlist_item.index
@@ -193,16 +193,19 @@ const load_player = function(playlist_item, options={}) {
     }
   }
 
-  media_div.addEventListener("ended", e => {
-    if (playlist_item.index < playlist.length) {
-      load_player(playlist[playlist_item.index + 1], {keep_cover: true})
-    }
-  })
+
 
   if (sametype) {
-    media_div.src = "/media/" + playlist_item.path.replace(/\#/g, "%23").replace(/\?/g, "%3f")
+    media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
   } else {
     const player_div = document.getElementById("MediaPlayer")
+    media_div.addEventListener("ended", e => {
+      if (currentState.playlist_index + 1 < playlist.length) {
+        load_player(playlist[currentState.playlist_index + 1], {keep_cover: true})
+      } else {
+        msg_show("Playback complete.")
+      }
+    })
     player_div.replaceWith(media_div)
   }
 }
