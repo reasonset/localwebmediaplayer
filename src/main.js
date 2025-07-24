@@ -8,7 +8,8 @@ var currentState = {
   path: null,
   scroll_position: {},
   viewportX: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
-  cover: null
+  cover: null,
+  imglist: []
 }
 
 const load_browser = async function(path) {
@@ -19,6 +20,7 @@ const load_browser = async function(path) {
     msg_show("HTTP Error")
   }
   currentState.filelist = result
+  build_imglist()
   
   const filelist_div = document.createElement("div")
   filelist_div.id = "FileList"
@@ -140,7 +142,6 @@ const set_playlist = function(type, pathes) {
 }
 
 const load_player = function(playlist_item, options={}) {
-  console.log(options)
   const type = playlist_item.type
   if (type === "unknown" ) {return}
   let media_div
@@ -221,9 +222,13 @@ const file_click = function(target, type) {
 }
 
 const single_play = function(path, type) {
-  set_playlist(type, [path])
-  load_player(playlist[0])
-  switch_player()
+  if (type === "image") {
+    show_imgview(path)
+  } else {
+    set_playlist(type, [path])
+    load_player(playlist[0])
+    switch_player()
+  }
 }
 
 const play_all_videos = function() {
@@ -284,6 +289,53 @@ const switch_browser = function() {
   player.style.display = "none"
 }
 
+const show_imgview = function(path) {
+  const box = document.getElementById("ImgViewerFigure")
+  const container = document.getElementById("ImgViewer")
+  const img = document.createElement("img")
+  img.src = "/media/" + path
+  img.dataset.path = path
+  box.firstChild.replaceWith(img)
+  container.style.display = "block"
+}
+
+const switch_imgview = function(path) {
+  const img = document.getElementById("ImgViewerFigure").firstChild
+  img.src = "/media/" + path
+  img.dataset.path = path
+}
+
+const hide_imgview_callback = function(e) {
+  const container = document.getElementById("ImgViewer")
+  const img = document.getElementById("ImgViewerFigure").firstChild
+  const rect = img.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const zone_width = rect.width / 3
+
+  if (x < zone_width) {
+    const index = currentState.imglist.indexOf(img.dataset.path)
+    if (index > 0) {
+      switch_imgview(currentState.imglist[index - 1])
+    }
+  } else if (x < zone_width * 2) {
+    container.style.display = "none"
+  } else {
+    const index = currentState.imglist.indexOf(img.dataset.path)
+    if (index < currentState.imglist.length - 1) {
+      switch_imgview(currentState.imglist[index + 1])
+    }
+  }
+  e.stopPropagation()
+}
+
+const build_imglist = function() {
+  for (const i of currentState.filelist.file) {
+    if (i.type === "image") {
+      currentState.imglist.push(i.path)
+    }
+  }
+}
+
 const msg_show = function(text) {
   const box = document.getElementById("MsgBox")
   box.innerText = text
@@ -310,6 +362,8 @@ document.getElementById("PlayAllAudio").addEventListener("click", e => { play_al
 
 document.getElementById("PlaylistNext").addEventListener("click", playlist_next)
 document.getElementById("PlaylistPrev").addEventListener("click", playlist_prev)
+
+document.getElementById("ImgViewer").addEventListener("click", hide_imgview_callback)
 
 const upelem = document.getElementById("UpParent")
 upelem.addEventListener("click", e => {

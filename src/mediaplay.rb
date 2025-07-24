@@ -11,6 +11,7 @@ module DirList
 
   MEDIA_EXT_VID = %w:.mp4 .mkv .mov .webm .ogv:
   MEDIA_EXT_AUD = %w:.mp3 .ogg .oga .opus .m4a .aac .flac .wav:
+  MEDIA_EXT_IMG = %w:.jpg .jpeg .png .webp .avif .heif .bmp .gif:
 
   def dir path
     path = nil if path && path.empty?
@@ -47,6 +48,12 @@ module DirList
         elsif MEDIA_EXT_AUD.include? ext.downcase
           files["file"].push({
             "type" => "music",
+            "path" => (path ? File.join(path, fn) : fn),
+            "ext" => ext
+          })
+        elsif MEDIA_EXT_IMG.include? ext.downcase
+          files["file"].push({
+            "type" => "image",
             "path" => (path ? File.join(path, fn) : fn),
             "ext" => ext
           })
