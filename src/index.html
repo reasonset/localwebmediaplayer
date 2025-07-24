@@ -15,6 +15,7 @@
           <div class="ctlbtn" id="PlayAllAudio"><img src="/img/music.svg" /><span class="ctlbtnlabel"> Play Audio</span></div>
           <div class="ctlbtn" id="PlayAllVideos"><img src="/img/video.svg" /><span class="ctlbtnlabel"> Play Video</span></div>
           <div class="ctlbtn" id="ShowPlayer"><img src="/img/play.svg" /><span class="ctlbtnlabel"> Show Player</span></div>
+          <div class="ctlbtn" id="BookReader"><img src="/img/book-open.svg" /><span class="ctlbtnlabel"> Book Reader</span></div>
         </div>
       </div>
       <div id="FileList">
@@ -34,10 +35,19 @@
     <div id="ImgViewer">
       <figure id="ImgViewerFigure"><img /></figure>
     </div>
-    <div id="BookReader">
+    <div id="BookReaderBox">
+      <div id="BookReaderOptionModalBox">
+        <div id="BookReaderOptionModal">
+          <form id="BookReaderOptionForm">
+            <button id="BookReaderOptionSpread">Toggle Spread View</button>
+            <button id="BookReaderOptionOrder">Toggle Page Order</button><br />
+            <label>Page <input type="text" size="4" id="BookReaderPageNumber" /></label><button id="BookReaderPageJump">Go</button>
+          </form>
+        </div>
+      </div>
+      <canvas id="BookReaderCanvas"></canvas>
 
     </div>
-    <div id="BookReaderOptionModal"></div>
     <div id="MsgBox" class="msgtrans">Msg</div>
   </body>
 </html>

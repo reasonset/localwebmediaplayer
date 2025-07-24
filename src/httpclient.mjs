@@ -13,11 +13,12 @@ class HTTPRedirectError extends HTTPStatusError {
 }
 
 class HTTPClient {
-  constructor(url, body, options) {
+  constructor(url, body, options={}) {
+    if (!options.headers) { options.headers = {} }
     this.url = this.create_request_url(url, options.query)
     this.body = this.create_request_body(body, options)
     this.options = options
-    this.params = this.create_http_params(body, options)
+    this.params = this.create_http_params(this.body, options)
   }
 
   create_request_url(url, query) {

@@ -68,3 +68,12 @@ Copy `sample/lighttpd.conf` and edit it.
 See `sample/lwmp.bash`.
 
 `MEDIA_ROOT` needs `/` at the end.
+
+# Resources Used
+
+This project includes the following external icon set:
+
+Feather Icons A clean and elegant SVG icon library <https://feathericons.com/> © 2013–2023 Cole Bemis — Licensed under the MIT License
+
+Icon files are located in the `src/img` directory. The corresponding Feather Icons license file is included in that directory.
+

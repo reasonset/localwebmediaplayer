@@ -9,7 +9,14 @@ var currentState = {
   scroll_position: {},
   viewportX: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
   cover: null,
-  imglist: []
+  imglist: [],
+  bookreader: {
+    spread: true,
+    rtl: false,
+    current_page: null,
+    shown: false,
+    force_single: false
+  }
 }
 
 const load_browser = async function(path) {
@@ -194,8 +201,6 @@ const load_player = function(playlist_item, options={}) {
     }
   }
 
-
-
   if (sametype) {
     media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
   } else {
@@ -329,11 +334,201 @@ const hide_imgview_callback = function(e) {
 }
 
 const build_imglist = function() {
+  currentState.imglist = []
   for (const i of currentState.filelist.file) {
     if (i.type === "image") {
       currentState.imglist.push(i.path)
     }
   }
+}
+
+const show_bookreader = function() {
+  const br_box = document.getElementById("BookReaderBox")
+  br_box.style.display = "block"
+  br_box.style.height = window.innerHeight + "px"
+  br_box.style.width = window.innerWidth + "px"
+  currentState.bookreader.shown = true
+  draw_bookreader_page()
+}
+
+const hide_bookreader = function() {
+  const br_box = document.getElementById("BookReaderBox")
+  br_box.style.display = "none"
+  currentState.bookreader.shown = false
+}
+
+const show_bookreader_options = function() {
+  const bro_box = document.getElementById("BookReaderOptionModalBox")
+  bro_box.style.display = "block"
+}
+
+const hide_bookreader_options = function(e) {
+  const bro_box = document.getElementById("BookReaderOptionModalBox")
+  bro_box.style.display = "none"
+  e.stopPropagation()
+}
+
+const bookreader_touch_callback = function(e) {
+  const br_box = document.getElementById("BookReaderBox")
+  const rect = br_box.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const zone_width = rect.width / 5
+  const zone_height = rect.height / 3
+
+  if (y < zone_height) {
+    show_bookreader_options()
+  } else {
+    if (x < zone_width) {
+      currentState.bookreader.rtl ? bookreader_next2() : bookreader_prev2()
+    } else if (x < zone_width * 2) {
+      currentState.bookreader.rtl ? bookreader_next1() : bookreader_prev1()
+    } else if (x < zone_width * 3) {
+      hide_bookreader()
+    } else if (x < zone_width * 4) {
+      currentState.bookreader.rtl ? bookreader_prev1() : bookreader_next1()
+    } else {
+      currentState.bookreader.rtl ? bookreader_prev2() : bookreader_next2()
+    }
+  }
+}
+
+const draw_bookreader_page = function(page=0) {
+  const pagenum = document.getElementById("BookReaderPageNumber")
+  const canvas = document.getElementById("BookReaderCanvas")
+  const ctx = canvas.getContext("2d")
+  const scale = window.devicePixelRatio
+
+  const desired_height = window.innerHeight
+  canvas.style.height = desired_height + "px"
+  const rect = canvas.getBoundingClientRect()
+  const maxWidth = rect.width * scale
+  const maxHeight = rect.height * scale
+  canvas.width = maxWidth
+  canvas.height = maxHeight
+  ctx.scale(scale, scale)
+
+  if (page < 0) { page = 0 }
+
+  currentState.force_single = false
+  if (currentState.bookreader.spread) {
+    draw_bookreader_page_spread({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+  } else {
+    draw_bookreader_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+  }
+}
+
+const draw_bookreader_page_spread = function({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page}) {
+  if (page > currentState.imglist.length - 2) { page = currentState.imglist.length - 2 }
+  const img1 = new Image()
+  const img2 = new Image()
+
+  img1.src = "/media/" + currentState.imglist[page]
+  img2.src = "/media/" + currentState.imglist[page + 1]
+
+  let loaded = 0
+  const onLoad = () => {
+    loaded++
+    if (loaded < 2) {return}
+
+    const aspect1 = img1.width / img1.height
+    const aspect2 = img2.width / img2.height
+
+    if (aspect1 > 1 || aspect2 > 1) {
+      currentState.bookreader.force_single = true
+      draw_bookreader_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+      return
+    }
+
+    const targetHeight = maxHeight
+    const drawWidth1 = targetHeight * aspect1
+    const drawWidth2 = targetHeight * aspect2
+
+    const totalWidth = drawWidth1 + drawWidth2
+    let fitScale = 1
+    if (totalWidth > maxWidth) {
+      fitScale = maxWidth / totalWidth
+    }
+
+    const finalHeight = targetHeight * fitScale / scale
+    const finalWidth1 = drawWidth1 * fitScale / scale
+    const finalWidth2 = drawWidth2 * fitScale / scale
+    
+    const centerX = rect.width / 2
+    const x1 = currentState.bookreader.rtl ? centerX : centerX - finalWidth1
+    const y1 = (rect.height - finalHeight) / 2
+    const y2 = y1
+    const x2 = currentState.bookreader.rtl ? centerX - finalWidth2 : centerX
+
+    ctx.drawImage(img1, x1, y1, finalWidth1, finalHeight)
+    ctx.drawImage(img2, x2, y2, finalWidth2, finalHeight)
+
+    currentState.bookreader.page = page
+    pagenum.value = page + 1
+  }
+
+  img1.onload = onLoad
+  img2.onload = onLoad
+}
+
+const draw_bookreader_page_single = function({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page}) {
+  if (page > currentState.imglist.length - 1) { page = currentState.imglist.length - 1 }
+  const img = new Image()
+
+  img.src = "/media/" + currentState.imglist[page]
+
+  img.onload = () => {
+    const hScale = maxHeight / img.height
+    const wScale = maxWidth / img.width
+    const iscale = Math.min(hScale, wScale)
+    const drawWidth = img.width * iscale / scale
+    const drawHeight = img.height * iscale / scale
+
+    const y = (rect.height - drawHeight) / 2
+    const centerX = rect.width / 2
+    const x = centerX - (drawWidth / 2)
+    ctx.drawImage(img, x, y, drawWidth, drawHeight)
+
+    currentState.bookreader.page = page
+    pagenum.value = page + 1
+  }
+}
+
+const bookreader_next1 = function() {
+  draw_bookreader_page(currentState.bookreader.page + 1)
+}
+
+const bookreader_next2 = function() {
+  const pages = (currentState.bookreader.spread && !currentState.bookreader.force_single) ? 2 : 1
+  draw_bookreader_page(currentState.bookreader.page + pages)
+}
+
+const bookreader_prev1 = function() {
+  draw_bookreader_page(currentState.bookreader.page - 1)
+}
+
+const bookreader_prev2 = function() {
+  const pages = (currentState.bookreader.spread && !currentState.bookreader.force_single) ? 2 : 1
+  draw_bookreader_page(currentState.bookreader.page - pages)
+}
+
+const bookreader_opt_spread = function(e) {
+  currentState.bookreader.spread = !currentState.bookreader.spread
+  draw_bookreader_page(currentState.bookreader.page)
+  e.preventDefault()
+}
+
+const bookreader_opt_rtl = function(e) {
+  currentState.bookreader.rtl = !currentState.bookreader.rtl
+  draw_bookreader_page(currentState.bookreader.page)
+  e.preventDefault()
+}
+
+const bookreader_opt_jump = function(e) {
+  const pagenum = document.getElementById("BookReaderPageNumber")
+  const target_page = pagenum.value || 1
+  draw_bookreader_page(Number(target_page) - 1)
+  e.preventDefault()
 }
 
 const msg_show = function(text) {
@@ -363,7 +558,16 @@ document.getElementById("PlayAllAudio").addEventListener("click", e => { play_al
 document.getElementById("PlaylistNext").addEventListener("click", playlist_next)
 document.getElementById("PlaylistPrev").addEventListener("click", playlist_prev)
 
+document.getElementById("BookReader").addEventListener("click", show_bookreader)
+
 document.getElementById("ImgViewer").addEventListener("click", hide_imgview_callback)
+document.getElementById("BookReaderBox").addEventListener("click", bookreader_touch_callback)
+document.getElementById("BookReaderBox").addEventListener("click", e => { e.stopPropagation() })
+document.getElementById("BookReaderOptionModalBox").addEventListener("click", hide_bookreader_options)
+document.getElementById("BookReaderOptionModal").addEventListener("click", e => { e.stopPropagation() })
+document.getElementById("BookReaderOptionSpread").addEventListener("click", bookreader_opt_spread)
+document.getElementById("BookReaderOptionOrder").addEventListener("click", bookreader_opt_rtl)
+document.getElementById("BookReaderPageJump").addEventListener("click", bookreader_opt_jump)
 
 const upelem = document.getElementById("UpParent")
 upelem.addEventListener("click", e => {
@@ -380,5 +584,13 @@ window.addEventListener("resize", e => {
   if (vpx != currentState.viewportX) {
     currentState.scroll_position = {}
     currentState.viewportX = vpx
+  }
+
+  if (currentState.bookreader.shown) {
+    hide_bookreader()
+
+    setTimeout(() => {
+      show_bookreader()
+    }, 500)
   }
 })
