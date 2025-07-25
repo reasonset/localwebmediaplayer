@@ -162,7 +162,7 @@ const load_player = function(playlist_item, options={}) {
       media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
       media_div.controls = true
       media_div.preload = "auto"
-      media_div.autoplay = "autoplay"
+      // media_div.autoplay = "autoplay"
 
       // Set cover
       if (options.cover) {
@@ -179,7 +179,7 @@ const load_player = function(playlist_item, options={}) {
       media_div.src = "/media/" + encodeURIComponent(playlist_item.path)
       media_div.controls = true
       media_div.preload = "auto"
-      media_div.autoplay = "autoplay"
+      // media_div.autoplay = "autoplay"
     }
   }
   currentState.playlist_index = playlist_item.index
@@ -214,6 +214,17 @@ const load_player = function(playlist_item, options={}) {
     })
     player_div.replaceWith(media_div)
   }
+
+  media_div.play().then(() => {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: playlist_item.path.split("/").at(-1),
+      artist: "Unknown Artist",
+      album: "Unknown Album",
+      artwork: options.cover ? [{
+        src: ('/media/' + options.cover)
+      }] : undefined
+    })
+  })
 }
 
 const file_click = function(target, type) {
@@ -348,6 +359,7 @@ const show_bookreader = function() {
   br_box.style.height = window.innerHeight + "px"
   br_box.style.width = window.innerWidth + "px"
   currentState.bookreader.shown = true
+  br_box.focus()
   draw_bookreader_page()
 }
 
@@ -592,4 +604,30 @@ window.addEventListener("resize", e => {
       show_bookreader()
     }, 300)
   }
+})
+
+// Setup keyboard event
+document.getElementById("BookReaderBox").addEventListener("keydown", e => {
+  if (e.code === "ArrowDown") {
+    bookreader_next2()
+  } else if (e.code === "ArrowUp") {
+    bookreader_prev2()
+  } else if (e.code === "ArrowLeft") {
+    currentState.bookreader.rtl ? bookreader_next2() : bookreader_prev2()
+  } else if (e.code === "ArrowRight") {
+    currentState.bookreader.rtl ? bookreader_prev2() : bookreader_next2()
+  } else if (e.code === "PageDown") {
+    bookreader_next1()
+  } else if (e.code === "PageUp") {
+    bookreader_prev1()
+  }
+})
+
+// Media key
+navigator.mediaSession?.setActionHandler('nexttrack', e => {
+  playlist_next()
+})
+
+navigator.mediaSession?.setActionHandler('previoustrack', e => {
+  playlist_prev()
 })
