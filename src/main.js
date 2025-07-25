@@ -16,7 +16,8 @@ var currentState = {
     current_page: null,
     shown: false,
     force_single: false
-  }
+  },
+  currentView: null
 }
 
 const load_browser = async function(path) {
@@ -49,7 +50,7 @@ const load_browser = async function(path) {
     fi.appendChild(fin)
 
     fi.addEventListener("click", e => {
-      load_browser(e.currentTarget.dataset.filePath)
+      load_browser_with_state(e.currentTarget.dataset.filePath)
     })
 
     filelist_div.appendChild(fi)
@@ -99,6 +100,15 @@ const load_browser = async function(path) {
   currentState.path = path
 
   currentState.cover = result.cover
+}
+
+const load_browser_with_state = function(path) {
+  history.pushState({
+    lwmp: true,
+    type: "browser",
+    path
+  }, "")
+  load_browser(path)
 }
 
 const get_type_from_ext = function(path) {
@@ -231,7 +241,7 @@ const file_click = function(target, type) {
   if (type === "list") {
     set_playlist(null, target.playlist)
     load_player(playlist[0])
-    switch_player()
+    switch_player_with_state()
   } else {
     single_play(target.dataset.filePath, type)
   }
@@ -239,11 +249,11 @@ const file_click = function(target, type) {
 
 const single_play = function(path, type) {
   if (type === "image") {
-    show_imgview(path)
+    show_imgview_with_state(path)
   } else {
     set_playlist(type, [path])
     load_player(playlist[0])
-    switch_player()
+    switch_player_with_state()
   }
 }
 
@@ -260,7 +270,7 @@ const play_all_videos = function() {
   }
   set_playlist("video", list)
   load_player(playlist[0])
-  switch_player()
+  switch_player_with_state()
 }
 
 const play_all_audio = function() {
@@ -276,7 +286,7 @@ const play_all_audio = function() {
   }
   set_playlist("music", list)
   load_player(playlist[0], {cover: currentState.cover})
-  switch_player()
+  switch_player_with_state()
 }
 
 const playlist_prev = function(e) {
@@ -296,6 +306,15 @@ const switch_player = function() {
   const player = document.getElementById("Player")
   browser.style.display = "none"
   player.style.display = "block"
+  currentState.currentView = "player"
+}
+
+const switch_player_with_state = function() {
+  switch_player()
+  history.pushState({
+    lwmp: true,
+    type: "player"
+  }, "")
 }
 
 const switch_browser = function() {
@@ -313,6 +332,16 @@ const show_imgview = function(path) {
   img.dataset.path = path
   box.firstChild.replaceWith(img)
   container.style.display = "block"
+  currentState.currentView = "imgview"
+}
+
+const show_imgview_with_state = function(path) {
+  show_imgview(path)
+  history.pushState({
+    lwmp: true,
+    type: "imgview",
+    path
+  }, "")
 }
 
 const switch_imgview = function(path) {
@@ -321,8 +350,12 @@ const switch_imgview = function(path) {
   img.dataset.path = path
 }
 
-const hide_imgview_callback = function(e) {
+const hide_imgview = function(e) {
   const container = document.getElementById("ImgViewer")
+  container.style.display = "none"
+}
+
+const hide_imgview_callback = function(e) {
   const img = document.getElementById("ImgViewerFigure").firstChild
   const rect = img.getBoundingClientRect()
   const x = e.clientX - rect.left
@@ -334,7 +367,7 @@ const hide_imgview_callback = function(e) {
       switch_imgview(currentState.imglist[index - 1])
     }
   } else if (x < zone_width * 2) {
-    container.style.display = "none"
+    history.back()
   } else {
     const index = currentState.imglist.indexOf(img.dataset.path)
     if (index < currentState.imglist.length - 1) {
@@ -354,6 +387,7 @@ const build_imglist = function() {
 }
 
 const show_bookreader = function() {
+  currentState.currentView = "book"
   const br_box = document.getElementById("BookReaderBox")
   br_box.style.display = "block"
   br_box.style.height = window.innerHeight + "px"
@@ -361,6 +395,14 @@ const show_bookreader = function() {
   currentState.bookreader.shown = true
   br_box.focus()
   draw_bookreader_page()
+}
+
+const show_bookreader_with_state = function() {
+  history.pushState({
+    lwmp: true,
+    type: "book"
+  }, "")
+  show_bookreader()
 }
 
 const hide_bookreader = function() {
@@ -396,7 +438,7 @@ const bookreader_touch_callback = function(e) {
     } else if (x < zone_width * 2) {
       currentState.bookreader.rtl ? bookreader_next1() : bookreader_prev1()
     } else if (x < zone_width * 3) {
-      hide_bookreader()
+      history.back()
     } else if (x < zone_width * 4) {
       currentState.bookreader.rtl ? bookreader_prev1() : bookreader_next1()
     } else {
@@ -556,20 +598,25 @@ const msg_show = function(text) {
 window.addEventListener("load", e => {
   let initial_path = window.location.search.replace(/^\?/, "") || ""
   initial_path = decodeURIComponent(initial_path)
-  load_browser(initial_path)
+  history.replaceState({
+    lwmp: true,
+    type: "browser",
+    path: initial_path
+  }, "")
+  load_browser_with_state(initial_path)
 })
 
 // Setup navigation button events
 
-document.getElementById("ShowPlayer").addEventListener("click", e => { switch_player() })
-document.getElementById("BackToBrowser").addEventListener("click", e => { switch_browser() })
+document.getElementById("ShowPlayer").addEventListener("click", e => { switch_player_with_state() })
+document.getElementById("BackToBrowser").addEventListener("click", e => { history.back() })
 document.getElementById("PlayAllVideos").addEventListener("click", e => { play_all_videos() })
 document.getElementById("PlayAllAudio").addEventListener("click", e => { play_all_audio() })
 
 document.getElementById("PlaylistNext").addEventListener("click", playlist_next)
 document.getElementById("PlaylistPrev").addEventListener("click", playlist_prev)
 
-document.getElementById("BookReader").addEventListener("click", show_bookreader)
+document.getElementById("BookReader").addEventListener("click", show_bookreader_with_state)
 
 document.getElementById("ImgViewer").addEventListener("click", hide_imgview_callback)
 document.getElementById("BookReaderBox").addEventListener("click", bookreader_touch_callback)
@@ -583,8 +630,9 @@ document.getElementById("BookReaderPageJump").addEventListener("click", bookread
 const upelem = document.getElementById("UpParent")
 upelem.addEventListener("click", e => {
   const pathview = document.getElementById("CurrentPath")
+  if (!pathview.value) { return }
   const path = pathview.value.replace(/\/[^/]*$/, "")
-  load_browser(path.includes("/") ? path : "")
+  load_browser_with_state(path.includes("/") ? path : "")
 })
 
 //
@@ -630,4 +678,40 @@ navigator.mediaSession?.setActionHandler('nexttrack', e => {
 
 navigator.mediaSession?.setActionHandler('previoustrack', e => {
   playlist_prev()
+})
+
+// Back navigation
+window.addEventListener("popstate", e => {
+  console.log(e.state)
+  const state = e.state
+  if (!state.lwmp) { return }
+  console.log(currentState)
+  if (currentState.currentView) {
+    switch (currentState.currentView) {
+      case "player":
+        switch_browser()
+        break
+      case "imgview":
+        hide_imgview()
+        break
+      case "book":
+        hide_bookreader()
+        break
+    }
+    currentState.currentView = null
+  } else {
+    switch (state.type) {
+      case "player":
+        switch_player()
+        break
+      case "imgview":
+        show_imgview(state.path)
+        break
+      case "book":
+        show_bookreader()
+        break
+      default:
+        load_browser(state.path)
+    }
+  }
 })
