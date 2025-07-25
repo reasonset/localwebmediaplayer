@@ -444,10 +444,9 @@ const draw_bookreader_page_spread = function({pagenum, canvas, ctx, scale, rect,
     const drawWidth1 = targetHeight * aspect1
     const drawWidth2 = targetHeight * aspect2
 
-    const totalWidth = drawWidth1 + drawWidth2
     let fitScale = 1
-    if (totalWidth > maxWidth) {
-      fitScale = maxWidth / totalWidth
+    if (drawWidth1 > (maxWidth / 2) || drawWidth2 > (maxWidth / 2)) {
+      fitScale = Math.min(((maxWidth / 2) / drawWidth1), ((maxWidth / 2) / drawWidth2))
     }
 
     const finalHeight = targetHeight * fitScale / scale
@@ -591,6 +590,6 @@ window.addEventListener("resize", e => {
 
     setTimeout(() => {
       show_bookreader()
-    }, 500)
+    }, 300)
   }
 })
