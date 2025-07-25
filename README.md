@@ -10,7 +10,7 @@ The software consists of a Ruby/CGI script to return file lists and a SPA front 
 
 The web server functionality relies on lighttpd.
 
-![Browser View](./filebrowser.webp)
+![Browser View](doc/img/filebrowser.webp)
 
 Frontend provides file browser view and video/audio player view.
 
@@ -26,7 +26,7 @@ Clicking `Play Video` will put all video files in this folder into a playlist.
 
 Click `Show Player` to switch to the Player view.
 
-![Player view](./videoplayer.webp)
+![Player view](doc/img/videoplayer.webp)
 
 Player view has a playlist.
 If an item remains in the playlist, it will automatically start playing the next item when playback ends.
@@ -34,6 +34,39 @@ If an item remains in the playlist, it will automatically start playing the next
 Clicking on an item in the playlist starts playback of that item.
 
 This software supports `.m3u` playlist *only* has relative path.
+
+![Image viewer](doc/img/imageviewer.webp)
+
+Clicking an image file opens the image viewer.
+
+The viewer is divided into three zones: left, center, and right.
+
+* Clicking the left zone shows the previous image
+* Clicking the right zone shows the next image
+* Clicking the center zone closes the viewer
+
+These zones are applied to the entire viewport of the image viewer, not to the image itself.
+
+![Book reader](doc/img/bookreader.webp)
+
+Clicking the `Book Reader` button opens a viewer that displays all images within the current folder.
+
+Pages are sorted in lexicographical order based on file names and cannot be rearranged.
+
+The book reader is displayed in full-viewport mode, divided vertically with a 1:2 ratio:
+
+* The upper section reveals reader options when clicked:
+    * Toggle between single and spread (two-page) view
+    * Switch page-turn direction (left-to-right or right-to-left)
+    * Jump to a specific page
+
+The lower section is split into five horizontal zones:
+
+* Clicking the center zone closes the reader
+* Clicking the left or right zones turns pages:
+    * Near the center: turns 1 page
+    * Near the edges: turns 2 pages
+    * Note: If only 1 image is displayed, the 2-page action will result in a single page turn
 
 ## Caution
 

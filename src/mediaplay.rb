@@ -11,7 +11,8 @@ module DirList
 
   MEDIA_EXT_VID = %w:.mp4 .mkv .mov .webm .ogv:
   MEDIA_EXT_AUD = %w:.mp3 .ogg .oga .opus .m4a .aac .flac .wav:
-  MEDIA_EXT_IMG = %w:.jpg .jpeg .png .webp .avif .heif .bmp .gif:
+  MEDIA_EXT_IMG = %w:.jpg .jpeg .jfif .pjpeg .pjp .png .webp .avif .bmp .gif:
+  # .heif .jxl
 
   def dir path
     path = nil if path && path.empty?
