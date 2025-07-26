@@ -35,6 +35,8 @@ Clicking on an item in the playlist starts playback of that item.
 
 This software supports `.m3u` playlist *only* has relative path.
 
+💡hint: Player supports nexttrack/previoustrack key.
+
 ![Image viewer](doc/img/imageviewer.webp)
 
 Clicking an image file opens the image viewer.
@@ -68,6 +70,17 @@ The lower section is split into five horizontal zones:
     * Near the edges: turns 2 pages
     * Note: If only 1 image is displayed, the 2-page action will result in a single page turn
 
+Book Reader Keyboard Operation:
+
+|Key|Turns|
+|-----|-------------------|
+|←|Left 2 pages|
+|→|Right 2 pages|
+|↓|Forward 2 pages|
+|↑|Back 2 pages|
+|PageDown|Forward 1 page|
+|PageUp|Back 1 page|
+
 ## Caution
 
 This software is intended to be used to play media from other devices within a LAN.
@@ -100,7 +113,7 @@ Copy `sample/lighttpd.conf` and edit it.
 
 See `sample/lwmp.bash`.
 
-`MEDIA_ROOT` needs `/` at the end.
+*`MEDIA_ROOT` needs `/` at the end.*
 
 # Resources Used
 
@@ -109,4 +122,8 @@ This project includes the following external icon set:
 Feather Icons A clean and elegant SVG icon library <https://feathericons.com/> © 2013–2023 Cole Bemis — Licensed under the MIT License
 
 Icon files are located in the `src/img` directory. The corresponding Feather Icons license file is included in that directory.
+
+# Other softwares
+
+* `httpclient.mjs` from [fetchwrapper](https://github.com/reasonset/fetchwrapper) ([Apache License 2.0](https://github.com/reasonset/fetchwrapper/blob/master/LICENSE))
 

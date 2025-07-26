@@ -682,10 +682,8 @@ navigator.mediaSession?.setActionHandler('previoustrack', e => {
 
 // Back navigation
 window.addEventListener("popstate", e => {
-  console.log(e.state)
   const state = e.state
   if (!state.lwmp) { return }
-  console.log(currentState)
   if (currentState.currentView) {
     switch (currentState.currentView) {
       case "player":
