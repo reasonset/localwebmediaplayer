@@ -1,0 +1,22 @@
+---
+# If you leave lwmp-start.rb in localwebmediaplayer/tools/script/lwmp-start.rb, you can omit it.
+repo: /path/to/repository
+# lighttpd_cmd: lighttpd_cmd: Optional. By default, the startup script attempts to launch Lighttpd using the command `lighttpd`.  
+#  If a different command is required, it can be specified here.
+#lighttpd_cmd: /usr/bin/lighttpd
+profiles:
+  foo: # foo is profile name
+    # media: Required parameter. Points to the root directory when accessed as a web application. It is the absolute path to the directory that will become the media library.
+    media: /home/foo/Music
+    # port: Required parameter. Specifies the port for the web server (Lighttpd).  
+    #   Make sure that simultaneously running profiles do not use overlapping ports.
+    port: 8000
+    # name: Optional. Specifies a name to identify the server instance.  
+    #   If omitted, the profile name will be used by default.  
+    #   In the future, this may be used for display by the SPA.
+    #name: foo Media Music
+    # metadata: Optional. Specifies the absolute path to the directory for storing the metadata database.  
+    #   The directory must already exist.  
+    #   When this option is set, the specified path will be used to store the GDBM database,  
+    #   and the SPA will also enable the metadata fetch feature.
+    #metadata: /home/foo/.local/state/lwmp/foo

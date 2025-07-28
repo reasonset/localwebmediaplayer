@@ -9,6 +9,9 @@ module DirList
   class BadRequest < StandardError
   end
 
+  class LackEnvironment < StandardError
+  end
+
   MEDIA_EXT_VID = %w:.mp4 .mkv .mov .webm .ogv:
   MEDIA_EXT_AUD = %w:.mp3 .ogg .oga .opus .m4a .aac .flac .wav:
   MEDIA_EXT_IMG = %w:.jpg .jpeg .jfif .pjpeg .pjp .png .webp .avif .bmp .gif:
@@ -97,15 +100,38 @@ class MediaPlayer
 
   def cgi
     @cgi = CGI.new
+    ready?
     val = dir(@cgi["path"])
+    addons val
 
     puts "Content-Type: application/json; charset=utf-8"
     puts
     puts JSON.dump(val)
+  rescue LackEnvironment
+    puts "Status: 503"
+    puts "Content-Type: text/plain"
+    puts
+    puts "Some environment variables are missing."
   rescue BadRequest
     puts "Status: 400"
     puts "Content-Type: text/plain"
     puts
+  end
+
+  def ready?
+    unless @root
+      raise LackEnvironment
+    end
+  end
+
+  def addons val
+    if @cgi["info"] == "true"
+      val["environment"] = {
+        "root" => ENV["MEDIA_ROOT"],
+        "server_name" => ENV["LWMP_INSTANCE_NAME"],
+        "use_metadata" => ENV["METADATA_DATABASE"]
+      }
+    end
   end
 end
 
