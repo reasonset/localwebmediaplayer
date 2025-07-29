@@ -250,6 +250,8 @@ const file_click = function(target, type) {
 const single_play = function(path, type) {
   if (type === "image") {
     show_imgview_with_state(path)
+  } else if (type === "plain") {
+    show_textview_with_state(path)
   } else {
     set_playlist(type, [path])
     load_player(playlist[0])
@@ -322,6 +324,32 @@ const switch_browser = function() {
   const player = document.getElementById("Player")
   browser.style.display = "block"
   player.style.display = "none"
+}
+
+
+const show_textview = async function(path) {
+  const box = document.getElementById("TextViewerBox")
+  const area = document.getElementById("TextViewer")
+  box.style.height = window.innerHeight + "px"
+  box.style.width = window.innerWidth + "px"
+  const body = await http.get("/media/" + path)
+  area.value = body
+  box.style.display = "grid"
+  currentState.currentView = "textview"
+}
+
+const show_textview_with_state = function(path) {
+  show_textview(path)
+  history.pushState({
+    lwmp: true,
+    type: "textview",
+    path
+  }, "")
+}
+
+const hide_textview = function(e) {
+  const box = document.getElementById("TextViewerBox")
+  box.style.display = "none"
 }
 
 const show_imgview = function(path) {
@@ -616,6 +644,8 @@ document.getElementById("PlayAllAudio").addEventListener("click", e => { play_al
 document.getElementById("PlaylistNext").addEventListener("click", playlist_next)
 document.getElementById("PlaylistPrev").addEventListener("click", playlist_prev)
 
+document.getElementById("TextViewerCloseBtn").addEventListener("click", e => { history.back() })
+
 document.getElementById("BookReader").addEventListener("click", show_bookreader_with_state)
 
 document.getElementById("ImgViewer").addEventListener("click", hide_imgview_callback)
@@ -689,6 +719,9 @@ window.addEventListener("popstate", e => {
       case "player":
         switch_browser()
         break
+      case "textview":
+        hide_textview()
+        break
       case "imgview":
         hide_imgview()
         break
@@ -701,6 +734,9 @@ window.addEventListener("popstate", e => {
     switch (state.type) {
       case "player":
         switch_player()
+        break
+      case "textview":
+        show_textview(state.path)
         break
       case "imgview":
         show_imgview(state.path)

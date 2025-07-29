@@ -174,7 +174,7 @@ To distribute folders (like music or videos) with LWMP, they must be accessible 
 
 In WSL, your Windows folders are mounted under `/mnt/`.
 
-| Location on Windows                | Path in WSL                           |
+| Location on Windows               | Path in WSL                          |
 |-----------------------------------|--------------------------------------|
 | `C:\Users\username\Music`         | `/mnt/c/Users/username/Music`        |
 | `D:\Videos`                       | `/mnt/d/Videos`                      |
