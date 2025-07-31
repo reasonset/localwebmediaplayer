@@ -92,17 +92,28 @@ It is not intended to be published on the Internet and such activities are dange
 * Ruby >= 3.2
 * OS uses UTF-8 based filename
 
+When use Metadata feature:
+
+* `gdbm` gem
+* FFmpeg
+
+## Recommendation
+
+LWMP strongly recommends using Linux.
+
+The software has not been tested on other platforms.
+
 ## Install
 
-* Clone this repository to your local.
+* Clone this repository to your local
 
 ## Configuration
 
 The configuration file should be placed at `${XDG_CONFIG_HOME:-$HOME/.config}/reasonset/lwmp.yaml`.  
 A sample configuration file is available at `sample/lwmp.yaml`, which you can copy and customize.
 
-There are two global settings: `repo` and `lighttpd_cmd`.  
-If you use `tools/script/lwmp-start.rb` in its default location, `repo` can be omitted.  
+There are two global settings: `repo` and `lighttpd_cmd`.
+If you use `tools/script/lwmp-start.rb` in its default location, `repo` can be omitted.
 In most cases, `lighttpd_cmd` does not need to be specified. You only need to set this if the Lighttpd command name is different or if it's not in your system's PATH.
 
 Individual instance settings should be written under the `profiles` section.  
@@ -120,6 +131,48 @@ Use the `profile_name` specified as a key in the `profiles` section of the confi
 
 You may also copy this script to a directory included in your system’s PATH for convenience.  
 In that case, make sure to specify the `repo` setting in the configuration file.
+
+# Metadata function
+
+The `metadata` profile parameter enables metadata handling via a GDBM-backed cache system. If this parameter specifies a directory path, a metadata cache database will be placed there, activating the metadata-related features.
+
+When enabled, clients will request metadata during playlist construction.  
+A helper script (`metadata.rb`) utilizes `ffprobe` to extract media metadata and respond to the client accordingly.
+
+Requirements:
+
+- `gdbm` Ruby gem
+- `ffprobe` (FFmpeg)
+
+Performance Considerations:
+
+- Metadata is cached on the client side, increasing memory usage.
+- Playlist generation may trigger metadata queries, resulting in slower load times due to `ffprobe` processing.
+- When metadata is active, album artwork (e.g., `cover.jpg`, `front.jpg`) will also be searched in the media file's directory if not found in the current working directory.
+
+Additionally, metadata integration enhances compatibility with OS-level mediaSession features. Enable this feature if rich metadata integration is essential. Disable it for faster response and lower resource usage.
+
+# Manual Deployment of the Web Application
+
+LWMP can operate on any web server that supports CGI execution.
+Use of Lighttpd or the `start-lwmp.rb` launcher is not strictly required.
+
+To run LWMP manually, the following conditions must be met:
+
+* The `src/` directory is served as the document root, with `*.rb` files executable as CGI scripts
+* Access to `/media/` must be mapped to the directory specified by `$MEDIA_ROOT`
+* Ruby scripts must be able to access filesystem paths as expected on Linux
+* The following environment variables must be propagated to CGI scripts:
+  * `$MEDIA_ROOT`
+  * `$LWMP_INSTANCE_NAME` (optional)
+  * `$METADATA_DATABASE` (required if metadata features are used)
+  * `$FFPROBE_CMD` (optional)
+
+Compatibility Note:
+CGI behavior varies between web servers. For example, `metadata.rb` reads from `$stdin` until EOF, which may cause issues on servers (such as Hiawatha) that keep CGI input streams open indefinitely.
+
+As a result, the officially supported deployment method remains:
+Linux environment using Lighttpd.
 
 # Windows Support
 

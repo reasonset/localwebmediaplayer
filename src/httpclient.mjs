@@ -68,10 +68,14 @@ class HTTPClient {
         // No content
         return null
       } else {
-        try {
-          return JSON.parse(text)
-        } catch(e) {
+        if (this.options.disable_parse_json) {
           return text
+        } else {
+          try {
+            return JSON.parse(text)
+          } catch(e) {
+            return text
+          }
         }
       }
     }

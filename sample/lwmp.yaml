@@ -1,9 +1,11 @@
 ---
 # If you leave lwmp-start.rb in localwebmediaplayer/tools/script/lwmp-start.rb, you can omit it.
 repo: /path/to/repository
-# lighttpd_cmd: lighttpd_cmd: Optional. By default, the startup script attempts to launch Lighttpd using the command `lighttpd`.  
+# lighttpd_cmd: Optional. By default, the startup script attempts to launch Lighttpd using the command `lighttpd`.  
 #  If a different command is required, it can be specified here.
 #lighttpd_cmd: /usr/bin/lighttpd
+# ffprobe: command to ffprobe. Use `ffprobe` by default.
+#ffprobe: /usr/local/bin/ffprobe
 profiles:
   foo: # foo is profile name
     # media: Required parameter. Points to the root directory when accessed as a web application. It is the absolute path to the directory that will become the media library.

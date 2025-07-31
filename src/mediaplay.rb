@@ -136,7 +136,8 @@ class MediaPlayer
       val["environment"] = {
         "root" => ENV["MEDIA_ROOT"],
         "server_name" => ENV["LWMP_INSTANCE_NAME"],
-        "use_metadata" => ENV["METADATA_DATABASE"]
+        "use_metadata" => (ENV["METADATA_DATABASE"] && !ENV["METADATA_DATABASE"].empty?),
+        "env" => ENV
       }
     end
   end

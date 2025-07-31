@@ -17,18 +17,29 @@ var currentState = {
     shown: false,
     force_single: false
   },
-  currentView: null
+  currentView: null,
+  systemInfo: null,
+  metadata: {}
 }
 
 const load_browser = async function(path) {
   let result
   try {
-    result = await http.get("/mediaplay.rb", {query: {path}})
+    const query = {path}
+    if (!currentState.systemInfo) {
+      query.info = "true"
+    }
+    result = await http.get("/mediaplay.rb", {query})
   } catch(e) {
-    msg_show("HTTP Error")
+    msg_show("HTTP Error", "err")
   }
   currentState.filelist = result
   build_imglist()
+
+  if (result.environment) {
+    currentState.systemInfo = result.environment
+    document.title = result.environment.server_name + " - Local Web Media Player"
+  }
   
   const filelist_div = document.createElement("div")
   filelist_div.id = "FileList"
@@ -122,21 +133,39 @@ const get_type_from_ext = function(path) {
   }
 }
 
-const set_playlist = function(type, pathes) {
+const set_playlist = async function(type, pathes) {
   playlist = []
   const ple = document.createElement("div")
   ple.id = "PlayList"
+  if (currentState.systemInfo.use_metadata) {
+    const missing_metadata = []
+    for (let i=0; i < pathes.length; i++) {
+      if (!currentState.metadata[pathes[i]]) {
+        missing_metadata.push(pathes[i])
+      }
+    }
+    if (missing_metadata.length > 0) {
+      show_progress()
+      const meta_result = await http.post("/metadata.rb", missing_metadata)
+      for (const k in meta_result) {
+        currentState.metadata[k] = meta_result[k]
+      }
+    }
+  }
   for (let i=0; i < pathes.length; i++) {
     let acttype = type || get_type_from_ext(pathes[i].replace(/.*\./, ""))
     playlist.push({
       path: pathes[i],
       index: i,
-      type: acttype
+      type: acttype,
+      metadata: currentState.metadata[pathes[i]]
     })
     const li = document.createElement("div")
     li.dataset.filePath = pathes[i]
     li.dataset.index = i
-    const lit = document.createTextNode(pathes[i].replace(/.*\//, ""))
+    const lit = document.createTextNode(
+      currentState.metadata[pathes[i]]?.tags?.title || pathes[i].replace(/.*\//, "")
+    )
     li.appendChild(lit)
     ple.appendChild(li)
 
@@ -160,6 +189,7 @@ const set_playlist = function(type, pathes) {
 
 const load_player = function(playlist_item, options={}) {
   const type = playlist_item.type
+  let cover_url
   if (type === "unknown" ) {return}
   let media_div
   const sametype = currentState.mediatype == type
@@ -174,15 +204,7 @@ const load_player = function(playlist_item, options={}) {
       media_div.preload = "auto"
       // media_div.autoplay = "autoplay"
 
-      // Set cover
-      if (options.cover) {
-        const imgdiv = document.createElement("div")
-        imgdiv.id = "CoverImage"
-        const coverimg = document.createElement("img")
-        coverimg.src = "/media/" + options.cover
-        imgdiv.appendChild(coverimg)
-        document.getElementById("CoverImage").replaceWith(imgdiv)
-      }
+
     } else if (type === "video") {
       media_div = document.createElement("video")
       media_div.id = "MediaPlayer"
@@ -195,8 +217,17 @@ const load_player = function(playlist_item, options={}) {
   currentState.playlist_index = playlist_item.index
   currentState.mediatype = type
 
-  // Reset cover
-  if (!options.keep_cover && !options.cover) {
+  // Set cover
+  cover_url = currentState.metadata[playlist_item.path]?.tags?.artwork?.[0]?.src || (options.cover && "/media/" + options.cover)
+  if (cover_url) {
+    const imgdiv = document.createElement("div")
+    imgdiv.id = "CoverImage"
+    const coverimg = document.createElement("img")
+    coverimg.src = cover_url
+    imgdiv.appendChild(coverimg)
+    document.getElementById("CoverImage").replaceWith(imgdiv)
+    // document.getElementById("CoverImage").appendChild(imgdiv)
+  } else {
     const imgdiv = document.createElement("div")
     imgdiv.id = "CoverImage"
     document.getElementById("CoverImage").replaceWith(imgdiv)
@@ -217,7 +248,7 @@ const load_player = function(playlist_item, options={}) {
     const player_div = document.getElementById("MediaPlayer")
     media_div.addEventListener("ended", e => {
       if (currentState.playlist_index + 1 < playlist.length) {
-        load_player(playlist[currentState.playlist_index + 1], {keep_cover: true})
+        load_player(playlist[currentState.playlist_index + 1], {cover: options.cover})
       } else {
         msg_show("Playback complete.")
       }
@@ -226,20 +257,15 @@ const load_player = function(playlist_item, options={}) {
   }
 
   media_div.play().then(() => {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: playlist_item.path.split("/").at(-1),
-      artist: "Unknown Artist",
-      album: "Unknown Album",
-      artwork: options.cover ? [{
-        src: ('/media/' + options.cover)
-      }] : undefined
-    })
+    if (currentState.metadata[playlist_item.path]) {
+      navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags)
+    }
   })
 }
 
-const file_click = function(target, type) {
+const file_click = async function(target, type) {
   if (type === "list") {
-    set_playlist(null, target.playlist)
+    await set_playlist(null, target.playlist)
     load_player(playlist[0])
     switch_player_with_state()
   } else {
@@ -247,19 +273,19 @@ const file_click = function(target, type) {
   }
 }
 
-const single_play = function(path, type) {
+const single_play = async function(path, type) {
   if (type === "image") {
     show_imgview_with_state(path)
   } else if (type === "plain") {
     show_textview_with_state(path)
   } else {
-    set_playlist(type, [path])
+    await set_playlist(type, [path])
     load_player(playlist[0])
     switch_player_with_state()
   }
 }
 
-const play_all_videos = function() {
+const play_all_videos = async function() {
   const list = []
   for (const i of currentState.filelist.file) {
     if (i.type === "video") {
@@ -270,12 +296,12 @@ const play_all_videos = function() {
     msg_show("No video on this directory.")
     return
   }
-  set_playlist("video", list)
+  await set_playlist("video", list)
   load_player(playlist[0])
   switch_player_with_state()
 }
 
-const play_all_audio = function() {
+const play_all_audio = async function() {
   const list = []
   for (const i of currentState.filelist.file) {
     if (i.type === "music") {
@@ -286,7 +312,7 @@ const play_all_audio = function() {
     msg_show("No audio on this directory.")
     return
   }
-  set_playlist("music", list)
+  await set_playlist("music", list)
   load_player(playlist[0], {cover: currentState.cover})
   switch_player_with_state()
 }
@@ -309,6 +335,7 @@ const switch_player = function() {
   browser.style.display = "none"
   player.style.display = "block"
   currentState.currentView = "player"
+  hide_progress()
 }
 
 const switch_player_with_state = function() {
@@ -332,7 +359,7 @@ const show_textview = async function(path) {
   const area = document.getElementById("TextViewer")
   box.style.height = window.innerHeight + "px"
   box.style.width = window.innerWidth + "px"
-  const body = await http.get("/media/" + path)
+  const body = await http.get(("/media/" + path), {disable_parse_json: true})
   area.value = body
   box.style.display = "grid"
   currentState.currentView = "textview"
@@ -612,13 +639,35 @@ const bookreader_opt_jump = function(e) {
   e.preventDefault()
 }
 
-const msg_show = function(text) {
+const msg_show = function(text, type="info") {
   const box = document.getElementById("MsgBox")
   box.innerText = text
-  box.className = "msgshow"
+  if (type === "err") {
+    box.className = "msgshow_err"
+  } else {
+    box.className = "msgshow_info"
+  }
 
-  window.setTimeout(()=> {box.className = "msgtrans"}, 3000)
+  setTimeout(
+    ()=> {
+      box.className = "msghide"
+    }, 3000
+  )
 }
+
+const show_progress = function() {
+  const pb = document.getElementById("ProgressWrapper")
+  pb.style.height = window.innerHeight + "px"
+  pb.style.width = window.innerWidth + "px"
+  pb.style.display = "block"
+  pb.offsetHeight
+}
+
+const hide_progress = function() {
+  const pb = document.getElementById("ProgressWrapper")
+  pb.style.display = "none"
+}
+
 
 /**
  * Load initial location.
@@ -674,6 +723,10 @@ window.addEventListener("resize", e => {
     currentState.scroll_position = {}
     currentState.viewportX = vpx
   }
+
+  const pw = document.getElementById("ProgressWrapper")
+  pw.style.height = window.innerHeight + "px"
+  pw.style.width = window.innerWidth + "px"
 
   if (currentState.bookreader.shown) {
     hide_bookreader()
