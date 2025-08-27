@@ -6,6 +6,7 @@
 @font-face {
   font-family: "absnamefont";
   src: url("/fonts/generic/FiraSansCondensed-Medium.ttf");
+  font-display: swap;
 }
 
 body {
@@ -34,7 +35,7 @@ body {
   font-size: 120%;
   font-weight: bold;
   margin: 2px auto;
-  font-family: "Novasquare", "absuifont", sans-serif;
+  font-family: "Genos", "absuifont", sans-serif;
 }
 
 .ctlbtn img {
