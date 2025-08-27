@@ -359,7 +359,7 @@ const show_textview = async function(path) {
   const area = document.getElementById("TextViewer")
   box.style.height = window.innerHeight + "px"
   box.style.width = window.innerWidth + "px"
-  const body = await http.get(("/media/" + path), {disable_parse_json: true})
+  const body = await http.get(("/media/" + encodeURIComponent(path)), {disable_parse_json: true})
   area.value = body
   box.style.display = "grid"
   currentState.currentView = "textview"
@@ -383,7 +383,7 @@ const show_imgview = function(path) {
   const box = document.getElementById("ImgViewerFigure")
   const container = document.getElementById("ImgViewer")
   const img = document.createElement("img")
-  img.src = "/media/" + path
+  img.src = "/media/" + encodeURIComponent(path)
   img.dataset.path = path
   box.firstChild.replaceWith(img)
   container.style.display = "block"
@@ -532,8 +532,8 @@ const draw_bookreader_page_spread = function({pagenum, canvas, ctx, scale, rect,
   const img1 = new Image()
   const img2 = new Image()
 
-  img1.src = "/media/" + currentState.imglist[page]
-  img2.src = "/media/" + currentState.imglist[page + 1]
+  img1.src = "/media/" + encodeURIComponent(currentState.imglist[page])
+  img2.src = "/media/" + encodeURIComponent(currentState.imglist[page + 1])
 
   let loaded = 0
   const onLoad = () => {
@@ -583,7 +583,7 @@ const draw_bookreader_page_single = function({pagenum, canvas, ctx, scale, rect,
   if (page > currentState.imglist.length - 1) { page = currentState.imglist.length - 1 }
   const img = new Image()
 
-  img.src = "/media/" + currentState.imglist[page]
+  img.src = "/media/" + encodeURIComponent(currentState.imglist[page])
 
   img.onload = () => {
     const hScale = maxHeight / img.height
