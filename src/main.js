@@ -549,6 +549,8 @@ const draw_bookreader_page_spread = function({pagenum, canvas, ctx, scale, rect,
       currentState.bookreader.force_single = true
       draw_bookreader_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
       return
+    } else {
+      currentState.bookreader.force_single = false
     }
 
     const targetHeight = maxHeight
