@@ -1,5 +1,10 @@
 # Version 1
 
+## v1.1.0 (2025-09-03)
+
+* Add Book reader shortcut: `Home`, `End`, `Esc`
+* Open PDF in external
+
 ## v1.0.0 (2025-08-01)
 
 * Add metadata support

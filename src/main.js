@@ -278,7 +278,9 @@ const single_play = async function(path, type) {
     show_imgview_with_state(path)
   } else if (type === "plain") {
     show_textview_with_state(path)
-  } else {
+  } else if (type === "external-link") {
+    open("/media/" + encodeURIComponent(path))
+  } else if (type === "music" || type === "video") {
     await set_playlist(type, [path])
     load_player(playlist[0])
     switch_player_with_state()
@@ -741,16 +743,33 @@ window.addEventListener("resize", e => {
 document.getElementById("BookReaderBox").addEventListener("keydown", e => {
   if (e.code === "ArrowDown") {
     bookreader_next2()
+    e.preventDefault()
   } else if (e.code === "ArrowUp") {
     bookreader_prev2()
+    e.preventDefault()
   } else if (e.code === "ArrowLeft") {
     currentState.bookreader.rtl ? bookreader_next2() : bookreader_prev2()
+    e.preventDefault()
   } else if (e.code === "ArrowRight") {
     currentState.bookreader.rtl ? bookreader_prev2() : bookreader_next2()
+    e.preventDefault()
   } else if (e.code === "PageDown") {
     bookreader_next1()
+    e.preventDefault()
   } else if (e.code === "PageUp") {
     bookreader_prev1()
+    e.preventDefault()
+  } else if (e.code === "Home") {
+    const pagenum = document.getElementById("BookReaderPageNumber")
+    pagenum.value = 1
+    bookreader_opt_jump(e)
+  } else if (e.code === "End") {
+    const pagenum = document.getElementById("BookReaderPageNumber")
+    pagenum.value = currentState.imglist.length // Adjust last page in draw.
+    bookreader_opt_jump(e)
+  } else if (e.code === "Escape") {
+    history.back()
+    e.preventDefault()
   }
 })
 
