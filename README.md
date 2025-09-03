@@ -80,6 +80,9 @@ Book Reader Keyboard Operation:
 |↑|Back 2 pages|
 |PageDown|Forward 1 page|
 |PageUp|Back 1 page|
+|Home|Jump to first page|
+|End|Jump to last page|
+|Esc|Close Book Reader|
 
 ## Caution
 
