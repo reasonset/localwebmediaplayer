@@ -1,5 +1,9 @@
 # Version 1
 
+## v1.1.1 (2025-09-03)
+
+* Fix force single bug
+
 ## v1.1.0 (2025-09-03)
 
 * Add Book reader shortcut: `Home`, `End`, `Esc`
