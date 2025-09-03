@@ -278,7 +278,9 @@ const single_play = async function(path, type) {
     show_imgview_with_state(path)
   } else if (type === "plain") {
     show_textview_with_state(path)
-  } else {
+  } else if (type === "external-link") {
+    open("/media/" + encodeURIComponent(path))
+  } else if (type === "music" || type === "video") {
     await set_playlist(type, [path])
     load_player(playlist[0])
     switch_player_with_state()

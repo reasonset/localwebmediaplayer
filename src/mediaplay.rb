@@ -17,6 +17,7 @@ module DirList
   MEDIA_EXT_IMG = %w:.jpg .jpeg .jfif .pjpeg .pjp .png .webp .avif .bmp .gif:
   # .heif .jxl
   MEDIA_EXT_TXT = %w:.txt .xml .html .xhtml .css .json .yaml .yml .toml .md .rst .t2t .wiki:
+  MEDIA_EXT_EXT = %w:.pdf:
 
   def dir path
     path = nil if path && path.empty?
@@ -65,6 +66,12 @@ module DirList
         elsif MEDIA_EXT_TXT.include? ext.downcase
           files["file"].push({
             "type" => "plain",
+            "path" => (path ? File.join(path, fn) : fn),
+            "ext" => ext
+          })
+        elsif MEDIA_EXT_EXT.include? ext.downcase
+          files["file"].push({
+            "type" => "external-link",
             "path" => (path ? File.join(path, fn) : fn),
             "ext" => ext
           })
