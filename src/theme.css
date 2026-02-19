@@ -23,6 +23,7 @@ body {
   padding: 6px;
   position: sticky;
   inset: 0px;
+  z-index: 5000;
 }
 
 .ctlbtn {

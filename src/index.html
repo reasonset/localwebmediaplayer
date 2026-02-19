@@ -42,6 +42,12 @@
             <button id="BookReaderOptionSpread">Toggle Spread View</button>
             <button id="BookReaderOptionOrder">Toggle Page Order</button><br />
             <label>Page <input type="text" size="4" id="BookReaderPageNumber" /></label><button id="BookReaderPageJump">Go</button>
+            <label>Preload page <select id="BookReaderOptionPreloadPage">
+              <option value="none">none</option>
+              <option value="ahead:once">Once load next up</option>
+              <option value="ahead:cache">Load next up and cache</option>
+              <option value="greedy:cache">Load all and cache</option>
+            </select></label><button id="BookReaderOptionPreloadPageSubmit">Apply</button>
           </form>
         </div>
       </div>
