@@ -1,5 +1,4 @@
 #!/bin/env ruby
-require 'cgi'
 require 'json'
 require 'gdbm'
 
@@ -84,7 +83,6 @@ class LWMPMetadata
     raise MetadataDisabledError unless @db_dir && !@db_dir.empty?
     stdin_data = $stdin.read
     body = JSON.load stdin_data
-    @cgi = CGI.new
 
     response = get body
 
