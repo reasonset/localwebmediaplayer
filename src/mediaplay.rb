@@ -1,9 +1,21 @@
 #!/bin/env ruby
-require 'cgi'
+require 'uri'
 require 'json'
 
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
+
+# Home made CGI alternative class
+class CGI
+  def initialize
+    query_string = ENV['QUERY_STRING'] || ""
+    @params = URI.decode_www_form(query_string).to_h
+  end
+
+  def [](key)
+    @params[key]
+  end
+end
 
 module DirList
   class BadRequest < StandardError

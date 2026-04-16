@@ -177,6 +177,19 @@ CGI behavior varies between web servers. For example, `metadata.rb` reads from `
 As a result, the officially supported deployment method remains:
 Linux environment using Lighttpd.
 
+# How to use mise
+
+Even if you use `mise exec` to launch the process, simply leaving the CGI handler empty will not allow `mise` to launch it properly. Furthermore, since Lighttpd’s CGI handler cannot accept arguments, you cannot use `mise` to launch the CGI interpreter as-is.
+
+To execute a CGI script via `mise`, prepare a script like the one below so that you can pass arguments using a single command:
+
+```bash
+#!/bin/bash
+exec mise exec ruby@4.0 -- ruby "$@"
+```
+
+Then, grant this file execute permissions and specify it using the absolute path in the Lighttpd CGI handler.
+
 # Windows Support
 
 To run this on Windows, you’ll need [WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/).  
