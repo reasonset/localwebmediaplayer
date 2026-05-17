@@ -48,7 +48,7 @@ module DirList
       elsif stat.file? || File.file?(File.realpath(File.join(dirpath, fn)))
         ext = File.extname(fn)
         exclude_exts = (ENV["EXCLUDE_EXTS"] || "").downcase.split(";")
-        next if exclude_exts.include?(ext)
+        next if exclude_exts.any? {|xext| fn[-(xext.length)..] == xext}
         if MEDIA_EXT_VID.include? ext.downcase
           files["file"].push({
             "type" => "video",

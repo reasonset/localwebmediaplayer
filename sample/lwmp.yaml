@@ -17,8 +17,15 @@ profiles:
     #   If omitted, the profile name will be used by default.  
     #   In the future, this may be used for display by the SPA.
     #name: foo Media Music
-    # metadata: Optional. Specifies the absolute path to the directory for storing the metadata database.  
+    # metadata: Optional. Specifies the absolute path to the directory for string the metadata database.  
+    #   The directory must already exist.
+    #metadata: /home/foo/.local/state/lwmp/foo/metadata
+    # thumb: Optional. Specifies the absolute path to the directory for string the thumbnail.
     #   The directory must already exist.  
-    #   When this option is set, the specified path will be used to store the GDBM database,  
-    #   and the SPA will also enable the metadata fetch feature.
-    #metadata: /home/foo/.local/state/lwmp/foo
+    #thumb: /home/foo/.local/state/lwmp/foo/thumbnail
+    # use_metadata: Optional. Disabling metadata feature.
+    #use_metadata: "no"
+    # use_thumbnail: Optional. Disabling thumbnail feature.
+    #use_thumbnail: "no"
+    # exclude: Optional. semi-colon separated suffix list for excluding from file list.
+    #exclude: ".info.json;.html"
