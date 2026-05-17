@@ -35,6 +35,7 @@ ENV["THUMB_ROOT"] = spec["thumb"]&.sub(%r:/$:, "") + "/"
 ENV["METADATA_ROOT"] = spec["metadata"]&.sub(%r:/$:, "") + "/"
 ENV["USE_METADATA"] = spec["use_metadata"]
 ENV["USE_THUMBNAIL"] = spec["use_thumbnail"]
+ENV["EXCLUDE_EXTS"] = spec["exclude"]
 ENV["SERVER_PORT"] = (spec["port"] or abort "Key 'port' is not found.").to_s
 ENV["LWMP_INSTANCE_NAME"] = spec["name"] || profile
 ENV["FFPROBE_CMD"] = config["ffprobe"] || "ffprobe"

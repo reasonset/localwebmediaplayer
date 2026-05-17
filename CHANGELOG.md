@@ -1,5 +1,9 @@
 # Version 1
 
+## v1.3.1 (2026-05-17)
+
+* Add extension excluding
+
 ## v1.3.0 (2026-05-17)
 
 * Add thumbnail support
