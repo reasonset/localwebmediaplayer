@@ -1,21 +1,11 @@
 #!/bin/env ruby
 require 'uri'
 require 'json'
+require 'rscgi'
+require_relative 'config'
 
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
-
-# Home made CGI alternative class
-class CGI
-  def initialize
-    query_string = ENV['QUERY_STRING'] || ""
-    @params = URI.decode_www_form(query_string).to_h
-  end
-
-  def [](key)
-    @params[key]
-  end
-end
 
 module DirList
   class BadRequest < StandardError
@@ -121,11 +111,11 @@ class MediaPlayer
   include DirList
 
   def initialize
-    @root = ENV["MEDIA_ROOT"]
+    @root = $config[:media_root]
   end
 
   def cgi
-    @cgi = CGI.new
+    @cgi = RsCgi.new
     ready?
     val = dir(@cgi["path"])
     addons val
@@ -153,10 +143,10 @@ class MediaPlayer
   def addons val
     if @cgi["info"] == "true"
       val["environment"] = {
-        "root" => ENV["MEDIA_ROOT"],
-        "server_name" => ENV["LWMP_INSTANCE_NAME"],
-        "use_metadata" => (ENV["METADATA_DATABASE"] && !ENV["METADATA_DATABASE"].empty?),
-        "env" => ENV
+        "root" => $config[:media_root],
+        "server_name" => $config[:instance_name],
+        "use_metadata" => $config[:use_metadata],
+        "use_thumbnail" => $config[:use_thumbnail],
       }
     end
   end

@@ -1,5 +1,17 @@
 # Version 1
 
+## v1.3.0 (2026-05-17)
+
+* Add thumbnail support
+
+## v1.2.1(2026-04-16)
+
+* Use home made CGI class instead of standard library CGI
+
+## v1.2.0 (2026-02-19)
+
+* Backport from Kolmics
+
 ## v1.1.1 (2025-09-03)
 
 * Fix force single bug

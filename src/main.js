@@ -29,6 +29,27 @@ const mediaURI = function (path) {
   return "/media/" + encodeURIComponent(path)
 }
 
+// Lazy image load observer
+const thumbnailObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target
+      const thumb = img.dataset.thumbnail
+      const temp_img = new Image()
+      temp_img.onload = () => {
+        console.log("LOADED")
+        img.src = thumb
+        img.className = "thumbnail"
+      }
+      temp_img.onerror = () => {
+        console.warn('Thumbnail load failed for:', thumb)
+      }
+      temp_img.src = thumb
+      observer.unobserve(img)
+    }
+  })
+}, {})
+
 const load_browser = async function(path) {
   let result
   try {
@@ -43,6 +64,7 @@ const load_browser = async function(path) {
   }
   currentState.filelist = result
   build_imglist()
+  thumbnailObserver.disconnect()
 
   if (result.environment) {
     currentState.systemInfo = result.environment
@@ -87,10 +109,16 @@ const load_browser = async function(path) {
     fii.className = i.type
     const fiii = document.createElement("img")
     fiii.src = `/img/${i.type}.svg`
+    if (currentState.systemInfo.use_thumbnail && ["video", "music", "image"].includes(i.type)) {
+      console.log(i)
+      fiii.dataset.thumbnail = `/thumb/${encodeURIComponent(i.path)}.thumb.webp`
+      fiii.className = "svgicon lazy-thumb"
+    } else {
+      fiii.className = "svgicon"
+    }
     const fin = document.createElement("div")
     fin.className = "filename"
     const fint = document.createTextNode(i.path.replace(/.*\//, ""))
-    fiii.className = "svgicon"
     fii.appendChild(fiii)
     fin.appendChild(fint)
     fi.appendChild(fii)
@@ -113,6 +141,10 @@ const load_browser = async function(path) {
 
   const l = document.getElementById("FileList")
   l.replaceWith(filelist_div)
+
+  filelist_div.querySelectorAll('.lazy-thumb').forEach(el => {
+    thumbnailObserver.observe(el)
+  })
 
   if (currentState.scroll_position[path] != null) {
     window.scrollTo({top: currentState.scroll_position[path]})
@@ -174,7 +206,7 @@ const set_playlist = async function(type, pathes) {
     li.dataset.filePath = pathes[i]
     li.dataset.index = i
     const lit = document.createTextNode(
-      currentState.metadata[pathes[i]]?.tags?.title || pathes[i].replace(/.*\//, "")
+      currentState.metadata[pathes[i]]?.tags?.title ? (currentState.metadata[pathes[i]].tags.title + (currentState.metadata[pathes[i]]?.tags?.artist ? ` - ${currentState.metadata[pathes[i]].tags.artist}` : "")) : pathes[i].replace(/.*\//, "")
     )
     li.appendChild(lit)
     ple.appendChild(li)
