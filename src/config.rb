@@ -1,0 +1,11 @@
+$config = {
+  use_metadata: true,
+  use_thumbnail: true,
+  ffprobe_cmd: "ffprobe",
+
+  # Generally, these settings should not be changed.
+  media_root: ENV["MEDIA_ROOT"].sub(%r:/$:, ""),
+  thumb_root: ENV["THUMB_ROOT"]&.sub(%r:/$:, "") || ENV["MEDIA_ROOT"].sub(%r:media/?$:, "thumb"),
+  meta_root: ENV["METADATA_ROOT"]&.sub(%r:/$:, "") || ENV["MEDIA_ROOT"].sub(%r:media/?$:, "meta"),
+  instance_name: ENV["LWMP_INSTANCE_NAME"]
+}

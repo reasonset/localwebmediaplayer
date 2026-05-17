@@ -1,6 +1,8 @@
 #!/bin/env ruby
 require 'json'
 require 'gdbm'
+require 'fileutils'
+require_relative 'config'
 
 class LWMPMetadata
   IMAGE_MIME = {
@@ -14,23 +16,29 @@ class LWMPMetadata
   end
 
   def initialize
-    @root = ENV["MEDIA_ROOT"]
-    @ffprobe = ENV["FFPROBE_CMD"] || "ffprobe"
+    @root = $config[:media_root]
+    @ffprobe = $config[:ffprobe_cmd] || "ffprobe"
     Encoding.default_external = "UTF-8"
   end
 
   def get list
     rv = {}
 
-    GDBM.open([ENV["METADATA_DATABASE"], "meta.db"].join("/"), 0644, GDBM::WRCREAT) do |dbm|
-      list.each do |path|
-        if dbm[path]
-          rv[path] = Marshal.load dbm[path]
-        else
-          meta = load_meta path
-          dbm[path] = Marshal.dump meta
-          rv[path] = meta
-        end
+    list.each do |path|
+      begin
+        File.realpath(path, $config[:media_root])
+      rescue
+        next
+      end
+      metapath = File.expand_path(path + ".info.json", $config[:meta_root])
+
+      if File.exist?(metapath)
+        rv[path] = JSON.load File.read metapath
+      else
+        meta = load_meta path
+        FileUtils.mkdir_p(File.dirname metapath) unless File.exist? File.dirname metapath
+        File.open(metapath, "w") {|f| JSON.dump meta, f }
+        rv[path] = meta
       end
     end
 
@@ -79,7 +87,7 @@ class LWMPMetadata
   end
 
   def cgi
-    @db_dir = ENV["METADATA_DATABASE"]
+    @db_dir = $config[:meta_root]
     raise MetadataDisabledError unless @db_dir && !@db_dir.empty?
     stdin_data = $stdin.read
     body = JSON.load stdin_data

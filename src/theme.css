@@ -68,9 +68,15 @@ body {
   cursor: pointer;
 }
 
-.file_item img {
+.file_item img.svgicon {
   height: 120px;
   width: 120px;
+}
+
+.file_item img.thumbnail {
+  height: 120px;
+  width: 120px;
+  object-fit: contain;
 }
 
 #Player video {

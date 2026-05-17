@@ -109,6 +109,7 @@ The software has not been tested on other platforms.
 ## Install
 
 * Clone this repository to your local
+* `gem install rscgi` if it's not installed
 
 ## Configuration
 
@@ -137,14 +138,14 @@ In that case, make sure to specify the `repo` setting in the configuration file.
 
 # Metadata function
 
-The `metadata` profile parameter enables metadata handling via a GDBM-backed cache system. If this parameter specifies a directory path, a metadata cache database will be placed there, activating the metadata-related features.
+If the `use_metadata` parameter is set to true, metadata support is enabled.
+Metadata is stored in the directory specified by `metadata_dir`, which can be set in `config.rb` or via the `METADATA_DIR` environment variable.
 
-When enabled, clients will request metadata during playlist construction.  
+When enabled, clients will request metadata during playlist construction.
 A helper script (`metadata.rb`) utilizes `ffprobe` to extract media metadata and respond to the client accordingly.
 
 Requirements:
 
-- `gdbm` Ruby gem
 - `ffprobe` (FFmpeg)
 
 Performance Considerations:
@@ -154,6 +155,23 @@ Performance Considerations:
 - When metadata is active, album artwork (e.g., `cover.jpg`, `front.jpg`) will also be searched in the media file's directory if not found in the current working directory.
 
 Additionally, metadata integration enhances compatibility with OS-level mediaSession features. Enable this feature if rich metadata integration is essential. Disable it for faster response and lower resource usage.
+
+# Thumbnail function
+
+If the `use_thumbnail` parameter is set to true, the metadata feature is enabled.
+Metadata is stored in the directory specified by `thumb_dir`. `thumb_dir` can be set in `config.rb` or via the `THUMB_DIR` environment variable.
+
+This thumbnail directory must be accessible to clients via `/thumb/`.
+
+Thumbnails must be built in advance using `create-thumbnail.rb`.
+
+```
+create-thumbnail.rb <media_dir> <thumb_dir>
+```
+
+If `use_thumbnail` is true, the client uses a intersection observer to monitor the file browser and replaces the icon with a thumbnail when the target entry is displayed on the screen.
+
+While this alleviates some of the pressure on the rate limit, a large number of requests may still be expected depending on the environment, so you may need to set a more lenient rate limit for the number of requests.
 
 # Manual Deployment of the Web Application
 
@@ -167,8 +185,9 @@ To run LWMP manually, the following conditions must be met:
 * Ruby scripts must be able to access filesystem paths as expected on Linux
 * The following environment variables must be propagated to CGI scripts:
   * `$MEDIA_ROOT`
+  * `$THUMB_ROOT` (optional)
+  * `$METADATA_ROOT` (optional)
   * `$LWMP_INSTANCE_NAME` (optional)
-  * `$METADATA_DATABASE` (required if metadata features are used)
   * `$FFPROBE_CMD` (optional)
 
 Compatibility Note:
