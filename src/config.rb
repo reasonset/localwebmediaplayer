@@ -1,6 +1,6 @@
 $config = {
   use_metadata: !["false", "no", "disable"].include?(ENV["USE_METADATA"]),
-  use_thumbnail: ["false", "no", "disable"].include?(ENV["USE_THUMBNAIL"]),
+  use_thumbnail: !["false", "no", "disable"].include?(ENV["USE_THUMBNAIL"]),
   ffprobe_cmd: "ffprobe",
 
   # Generally, these settings should not be changed.
