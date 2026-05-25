@@ -149,6 +149,7 @@ class MediaPlayer
         "server_name" => $config[:instance_name],
         "use_metadata" => $config[:use_metadata],
         "use_thumbnail" => $config[:use_thumbnail],
+        "videoplayer" => $config[:videoplayer]
       }
     end
   end

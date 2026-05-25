@@ -173,6 +173,18 @@ If `use_thumbnail` is true, the client uses a intersection observer to monitor t
 
 While this alleviates some of the pressure on the rate limit, a large number of requests may still be expected depending on the environment, so you may need to set a more lenient rate limit for the number of requests.
 
+# Video Player with Library
+
+By changing the `videoplayer` value in `config.rb`, you can replace the plain `video` element with a video player that uses a library.
+
+Since the library is loaded dynamically, leaving this value at its default setting will prevent the external library from being loaded.
+
+## vidstack
+
+Use vidstack. The library is loaded from a CDN.
+
+vidstack enables users to fast-forward and rewind videos using the keyboard.
+
 # Manual Deployment of the Web Application
 
 LWMP can operate on any web server that supports CGI execution.
