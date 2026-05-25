@@ -9,6 +9,7 @@ const create_videoelem_vidstack = function(src, tags=null) {
   player.appendChild(provider)
   player.appendChild(layout)
   player.id = "MediaPlayer"
+  player.classList.add("video_player_box")
 
   player.letsPlay = async function() {
     if (!player.setAttribute.canPlay) {

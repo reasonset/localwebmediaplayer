@@ -68,6 +68,16 @@ const setupSystemInfo = function(env) {
         create_videoelem = mod.create_videoelem_vidstack
       })
       break
+    case "vlitejs":
+      const css3 = document.createElement("link")
+      css3.rel = "stylesheet"
+      css3.href = "https://cdn.jsdelivr.net/npm/vlitejs@6/dist/vlite.css"
+      css3.crossOrigin = true
+      document.head.appendChild(css3)
+      import("/videoplayer-vlitejs.js").then(mod => {
+        create_videoelem = mod.create_videoelem_vlitejs
+      })
+      break
     default:
       void 0
   }
@@ -199,6 +209,7 @@ const get_type_from_ext = function(path) {
 const create_videoelem_vanilla = function(src, tags=null) {
   const media_div = document.createElement("video")
   media_div.id = "MediaPlayer"
+  media_div.classList.add("video_player_box")
   media_div.src = src
   media_div.controls = true
   media_div.preload = "auto"
