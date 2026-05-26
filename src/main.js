@@ -37,7 +37,6 @@ const thumbnailObserver = new IntersectionObserver((entries, observer) => {
       const thumb = img.dataset.thumbnail
       const temp_img = new Image()
       temp_img.onload = () => {
-        console.log("LOADED")
         img.src = thumb
         img.className = "thumbnail"
       }
@@ -49,6 +48,58 @@ const thumbnailObserver = new IntersectionObserver((entries, observer) => {
     }
   })
 }, {})
+
+const setupSystemInfo = function(env) {
+  currentState.systemInfo = env
+  document.title = env.server_name + " - Local Web Media Player"
+
+  // Video Player setup
+  switch (env.videoplayer) {
+    case "vidstack":
+      import("/videoplayer-vidstack.js").then(mod => {
+        create_videoelem = mod.create_videoelem_vidstack
+      })
+      break
+    case "vlitejs":
+      import("/videoplayer-vlitejs.js").then(mod => {
+        create_videoelem = mod.create_videoelem_vlitejs
+      })
+      break
+    case "plyr":
+      import("/videoplayer-plyr.js").then(mod => {
+        create_videoelem = mod.create_videoelem_plyr
+      })
+      break
+    case "fluid":
+      import("/videoplayer-fluid.js").then(mod => {
+        create_videoelem = mod.create_videoelem_fluid
+      })
+      break
+    default:
+      void 0
+  }
+
+  // Audio Player setup
+  switch (env.audioplayer) {
+    case "vidstack":
+      import("/videoplayer-vidstack.js").then(mod => {
+        create_audioelem = mod.create_audioelem_vidstack
+      })
+      break
+    case "vlitejs":
+      import("/videoplayer-vlitejs.js").then(mod => {
+        create_audioelem = mod.create_audioelem_vlitejs
+      })
+      break
+    case "plyr":
+      import("/videoplayer-plyr.js").then(mod => {
+        create_audioelem = mod.create_audioelem_plyr
+      })
+      break
+    default:
+      void 0
+  }
+}
 
 const load_browser = async function(path) {
   let result
@@ -67,8 +118,7 @@ const load_browser = async function(path) {
   thumbnailObserver.disconnect()
 
   if (result.environment) {
-    currentState.systemInfo = result.environment
-    document.title = result.environment.server_name + " - Local Web Media Player"
+    setupSystemInfo(result.environment)
   }
 
   const filelist_div = document.createElement("div")
@@ -110,7 +160,6 @@ const load_browser = async function(path) {
     const fiii = document.createElement("img")
     fiii.src = `/img/${i.type}.svg`
     if (currentState.systemInfo.use_thumbnail && ["video", "music", "image"].includes(i.type)) {
-      console.log(i)
       fiii.dataset.thumbnail = `/thumb/${encodeURIComponent(i.path)}.thumb.webp`
       fiii.className = "svgicon lazy-thumb"
     } else {
@@ -174,6 +223,32 @@ const get_type_from_ext = function(path) {
     return "unknown"
   }
 }
+
+const create_videoelem_vanilla = function(src, tags=null) {
+  const media_div = document.createElement("video")
+  media_div.id = "MediaPlayer"
+  media_div.classList.add("video_player_box")
+  media_div.src = src
+  media_div.controls = true
+  media_div.preload = "auto"
+  media_div.letsPlay = media_div.play
+  media_div.updateSrc = (src, tags) => { media_div.src = src }
+  return media_div
+}
+
+const create_audioelem_vanilla = function(src, tags=null) {
+  const media_div = document.createElement("audio")
+  media_div.id = "MediaPlayer"
+  media_div.src = src
+  media_div.controls = true
+  media_div.preload = "auto"
+  media_div.letsPlay = media_div.play
+  media_div.updateSrc = (src, tags) => { media_div.src = src }
+  return media_div
+}
+
+var create_videoelem = create_videoelem_vanilla
+var create_audioelem = create_audioelem_vanilla
 
 const set_playlist = async function(type, pathes) {
   playlist = []
@@ -239,20 +314,10 @@ const load_player = function(playlist_item, options={}) {
     media_div = document.getElementById("MediaPlayer")
   } else {
     if (type === "music") {
-      media_div = document.createElement("audio")
-      media_div.id = "MediaPlayer"
-      media_div.src = mediaURI(playlist_item.path)
-      media_div.controls = true
-      media_div.preload = "auto"
+      media_div = create_audioelem(mediaURI(playlist_item.path), currentState.metadata[playlist_item.path]?.tags)
       // media_div.autoplay = "autoplay"
-
-
     } else if (type === "video") {
-      media_div = document.createElement("video")
-      media_div.id = "MediaPlayer"
-      media_div.src = mediaURI(playlist_item.path)
-      media_div.controls = true
-      media_div.preload = "auto"
+      media_div = create_videoelem(mediaURI(playlist_item.path), currentState.metadata[playlist_item.path]?.tags)
       // media_div.autoplay = "autoplay"
     }
   }
@@ -285,7 +350,7 @@ const load_player = function(playlist_item, options={}) {
   }
 
   if (sametype) {
-    media_div.src = mediaURI(playlist_item.path)
+    media_div.updateSrc(mediaURI(playlist_item.path), currentState.metadata[playlist_item.path].tags)
   } else {
     const player_div = document.getElementById("MediaPlayer")
     media_div.addEventListener("ended", e => {
@@ -298,7 +363,7 @@ const load_player = function(playlist_item, options={}) {
     player_div.replaceWith(media_div)
   }
 
-  media_div.play().then(() => {
+  media_div.letsPlay().then(() => {
     if (currentState.metadata[playlist_item.path]) {
       navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags)
     }

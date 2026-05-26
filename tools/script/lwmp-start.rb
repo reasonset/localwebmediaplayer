@@ -39,5 +39,7 @@ ENV["EXCLUDE_EXTS"] = spec["exclude"] || ""
 ENV["SERVER_PORT"] = (spec["port"] or abort "Key 'port' is not found.").to_s
 ENV["LWMP_INSTANCE_NAME"] = spec["name"] || profile
 ENV["FFPROBE_CMD"] = config["ffprobe"] || "ffprobe"
+ENV["VIDEOPLAYER"] = spec["videoplayer"] || config["videoplayer"] || "default"
+ENV["AUDIOPLAYER"] = spec["audioplayer"] || config["audioplayer"] || "default"
 
 exec((config["lighttpd_cmd"] || "lighttpd"), "-D", "-f", [config["repo"], "tools", "lighttpd", "lwmp.lighttpd.conf"].join("/"))
