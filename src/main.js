@@ -56,26 +56,44 @@ const setupSystemInfo = function(env) {
   // Video Player setup
   switch (env.videoplayer) {
     case "vidstack":
-      const css1 = document.createElement("link")
-      css1.rel = "stylesheet"
-      css1.href = "https://cdn.vidstack.io/player/theme.css"
-      const css2 = document.createElement("link")
-      css2.rel = "stylesheet"
-      css2.href = "https://cdn.vidstack.io/player/video.css"
-      document.head.appendChild(css1)
-      document.head.appendChild(css2)
       import("/videoplayer-vidstack.js").then(mod => {
         create_videoelem = mod.create_videoelem_vidstack
       })
       break
     case "vlitejs":
-      const css3 = document.createElement("link")
-      css3.rel = "stylesheet"
-      css3.href = "https://cdn.jsdelivr.net/npm/vlitejs@6/dist/vlite.css"
-      css3.crossOrigin = true
-      document.head.appendChild(css3)
       import("/videoplayer-vlitejs.js").then(mod => {
         create_videoelem = mod.create_videoelem_vlitejs
+      })
+      break
+    case "plyr":
+      import("/videoplayer-plyr.js").then(mod => {
+        create_videoelem = mod.create_videoelem_plyr
+      })
+      break
+    case "fluid":
+      import("/videoplayer-fluid.js").then(mod => {
+        create_videoelem = mod.create_videoelem_fluid
+      })
+      break
+    default:
+      void 0
+  }
+
+  // Audio Player setup
+  switch (env.audioplayer) {
+    case "vidstack":
+      import("/videoplayer-vidstack.js").then(mod => {
+        create_audioelem = mod.create_audioelem_vidstack
+      })
+      break
+    case "vlitejs":
+      import("/videoplayer-vlitejs.js").then(mod => {
+        create_audioelem = mod.create_audioelem_vlitejs
+      })
+      break
+    case "plyr":
+      import("/videoplayer-plyr.js").then(mod => {
+        create_audioelem = mod.create_audioelem_plyr
       })
       break
     default:

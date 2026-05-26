@@ -2,7 +2,8 @@ $config = {
   use_metadata: !["false", "no", "disable"].include?(ENV["USE_METADATA"]),
   use_thumbnail: !["false", "no", "disable"].include?(ENV["USE_THUMBNAIL"]),
   ffprobe_cmd: "ffprobe",
-  videoplayer: "default", # vidstack, default
+  videoplayer: ENV["VIDEOPLAYER"] || "default", # vidstack, vlitejs, plyr, fluid, default
+  audioplayer: ENV["AUDIOPLAYER"] || "default", # vidstack, vlitejs, plyr, default
 
   # Generally, these settings should not be changed.
   media_root: ENV["MEDIA_ROOT"].sub(%r:/$:, ""),

@@ -173,9 +173,11 @@ If `use_thumbnail` is true, the client uses a intersection observer to monitor t
 
 While this alleviates some of the pressure on the rate limit, a large number of requests may still be expected depending on the environment, so you may need to set a more lenient rate limit for the number of requests.
 
-# Video Player with Library
+# Video Player / Audio Player with Library
 
 By changing the `videoplayer` value in `config.rb`, you can replace the plain `video` element with a video player that uses a library.
+
+Similarly, by configuring the `audioplayer` property, you can set the system to use the audio player functionality of the video player library instead of the plain `audio` element.
 
 Since the library is loaded dynamically, leaving this value at its default setting will prevent the external library from being loaded.
 
@@ -184,6 +186,26 @@ Since the library is loaded dynamically, leaving this value at its default setti
 Use vidstack. The library is loaded from a CDN.
 
 vidstack enables users to fast-forward and rewind videos using the keyboard.
+
+## vlitejs
+
+Use vLiteJS. The library is loaded from a CDN.
+
+The volume bar and hotkey plugins are enabled.
+
+## plyr
+
+Use Plyr. The library is loaded from a CDN.
+
+I'm aware of an issue where resizing the video player in Plyr does not work properly, causing the video to be cropped.
+However, since we have not found a universal solution, this issue has been left unresolved.
+Plyr has other issues as well, so it may no longer be supported in the future.
+
+## fluid
+
+Use Fluid Player. The library is loaded from a CDN.
+
+Since Fluid Player does not provide an interface for use in place of the `audio` element, you cannot specify `fluid` as the value for `audioplayer`.
 
 # Manual Deployment of the Web Application
 
