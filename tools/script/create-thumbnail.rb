@@ -27,7 +27,7 @@ Find.find(media_dir) do |fp|
   case
   when MEDIA_EXT_VID.include?(ext)
     next unless mime == "video"
-    system("ffmpeg", "-i", fp, "-vf", "thumbnail=1800", "-frames:v", "1", efp)
+    system("ffmpeg", "-i", fp, "-vf", "thumbnail=300", "-vf", "scale=300:300:force_original_aspect_ratio=decrease", "-frames:v", "1", efp)
   when MEDIA_EXT_AUD.include?(ext)
     next unless mime == "audio"
     # Album art exists?
