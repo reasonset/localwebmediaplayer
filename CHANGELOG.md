@@ -1,5 +1,13 @@
 # Version 1
 
+## v1.4.3 (2026-06-07)
+
+* Revert to 1.4.1
+
+## v1.4.2 (2026-06-07)
+
+* Update CSS for video players
+
 ## v1.4.1 (2026-05-28)
 
 * Update thumbnail util
