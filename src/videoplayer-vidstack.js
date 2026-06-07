@@ -15,6 +15,7 @@ document.head.appendChild(css3)
 
 const create_videoelem_vidstack = function(src, tags=null) {
   const player = document.createElement("media-player")
+  player.setAttribute("keyTarget", "player")
   player.title = tags?.title
   player.src = src
   const provider = document.createElement("media-provider")
