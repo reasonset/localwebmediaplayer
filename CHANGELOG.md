@@ -1,5 +1,13 @@
 # Version 1
 
+## v1.4.1 (2026-05-28)
+
+* Update thumbnail util
+
+## v1.4.0 (2026-05-26)
+
+* Add player library support (Vidstack, vLiteJS, Plyr, Fluid Player)
+
 ## v1.3.1 (2026-05-17)
 
 * Add extension excluding
