@@ -99,9 +99,8 @@ body {
   display: block;
 }
 
-/* Prevent vertical expansion */
-#MediaPlayer.vlitejs-audio-box, #MediaPlayer.vlitejs-audio-box .v-container, #MediaPlayer.fluid_video_wrapper, #MediaPlayer.fluid_video_wrapper video, .plyr__video-wrapper, .plyr__video-wrapper video {
-  height: auto !important;
+#MediaPlayer.vlitejs-audio-box, #MediaPlayer.vlitejs-audio-box .v-container {
+  height: auto;
 }
 
 #Player audio {

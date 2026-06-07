@@ -197,6 +197,10 @@ The volume bar and hotkey plugins are enabled.
 
 Use Plyr. The library is loaded from a CDN.
 
+I'm aware of an issue where resizing the video player in Plyr does not work properly, causing the video to be cropped.
+However, since we have not found a universal solution, this issue has been left unresolved.
+Plyr has other issues as well, so it may no longer be supported in the future.
+
 ## fluid
 
 Use Fluid Player. The library is loaded from a CDN.
