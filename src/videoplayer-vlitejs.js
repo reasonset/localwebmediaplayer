@@ -1,6 +1,7 @@
 import Vlitejs from 'https://cdn.jsdelivr.net/npm/vlitejs@8'
 import VlitejsVolumeBar from 'https://cdn.jsdelivr.net/npm/vlitejs@8/dist/plugins/volume-bar.js'
 import VlitejsHotkeys from 'https://cdn.jsdelivr.net/npm/vlitejs@8/dist/plugins/hotkeys.js'
+import { audio_error_handler } from './audio-error-handler.js'
 
 const css3 = document.createElement("link")
 css3.rel = "stylesheet"
@@ -47,6 +48,7 @@ const create_videoelem_vlitejs = function(src, tags=null) {
 
 const create_audioelem_vlitejs = function(src, tags=null) {
   const player_raw = document.createElement("audio")
+  player_raw.addEventListener("error", audio_error_handler)
   const dummy = document.createElement("div")
   dummy.appendChild(player_raw)
 

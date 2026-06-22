@@ -1,11 +1,13 @@
 #!/bin/env ruby
 require 'uri'
 require 'json'
-require 'rscgi'
-require_relative 'config'
+require 'yaml'
+require_relative 'rscgi'
 
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
+
+$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolize_names: true)
 
 module DirList
   class BadRequest < StandardError
@@ -20,6 +22,10 @@ module DirList
   # .heif .jxl
   MEDIA_EXT_TXT = %w:.txt .xml .html .xhtml .css .json .yaml .yml .toml .md .rst .t2t .wiki:
   MEDIA_EXT_EXT = %w:.pdf:
+
+  def thumbnail_exist? path, fn
+    File.exist? File.join($config[:thumb_root], path, fn + ".thumb.webp")
+  end
 
   def dir path
     path = nil if path && path.empty?
@@ -47,25 +53,27 @@ module DirList
         files["cover"] ||= (path ? File.join(path, fn) : fn)
       elsif stat.file? || File.file?(File.realpath(File.join(dirpath, fn)))
         ext = File.extname(fn)
-        exclude_exts = (ENV["EXCLUDE_EXTS"] || "").downcase.split(";")
-        next if exclude_exts.any? {|xext| fn[-(xext.length)..] == xext}
+        next if $config[:exclude_exts].any? {|xext| fn[-(xext.length)..] == xext}
         if MEDIA_EXT_VID.include? ext.downcase
           files["file"].push({
             "type" => "video",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_AUD.include? ext.downcase
           files["file"].push({
             "type" => "music",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_IMG.include? ext.downcase
           files["file"].push({
             "type" => "image",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_TXT.include? ext.downcase
           files["file"].push({
@@ -150,7 +158,8 @@ class MediaPlayer
         "use_metadata" => $config[:use_metadata],
         "use_thumbnail" => $config[:use_thumbnail],
         "videoplayer" => $config[:videoplayer],
-        "audioplayer" => $config[:audioplayer]
+        "audioplayer" => $config[:audioplayer],
+        "report_decode_error" => $config[:report_decode_error]
       }
     end
   end

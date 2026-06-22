@@ -1,3 +1,28 @@
+# Version 2
+
+## v2.0.0 (2026-06-22)
+
+**IMCOMPATIBLE CHANGES**
+
+* Settings are now passed to environment variables as YAML strings via `lwmp-start.rb`.
+  * As a result, `config.rb` is no longer needed.
+  * The way some settings are specified has changed; values that should be Boolean are now passed as actual Boolean values rather than strings like “no”.
+  * Instead of specifying `exclude` as a string, you must now pass an array as the `exclude_exts` entry.
+  * It is now effectively mandatory to use `lwmp-start.rb` to start the service.
+  * You no longer need to update the Lighttpd configuration file when new configuration values are added.
+* Add report decoding error and batch cli.
+* The `thumb` setting has been removed.
+  * It has been merged into `cache_root`, and `$cache_root/thumb` is now used instead. Clients now use `/transcode/thumb` instead.
+* The `metadata` setting has been removed.
+  * It has been merged into `data_root`, and `$data_root/metadata` is now used.
+* Determine whether a thumbnail exists in the server application and suppress thumbnail requests that result in a "Not Found" error
+* Added a fallback mechanism for when audio files cannot be played
+  * If `report_decode_error` is true, the client sends a notification to the server when it fails to play an audio file
+  * The sent notification is added to the fallback list. This list is used by `create-transcode.rb` during batch processing.
+  * `create-transcode.rb` generates fallback audio files and records the fallback information in `transcode_meta.json`. If the original audio file is lossy, it generates two versions: one with the metadata removed and one re-encoded in Opus.
+  * The client retrieves `transcode_meta.json` and, if listed there, fetches the fallback audio file instead. This occurs even if `report_decode_error` is disabled.
+* Included the rscgi library
+
 # Version 1
 
 ## v1.4.3 (2026-06-07)

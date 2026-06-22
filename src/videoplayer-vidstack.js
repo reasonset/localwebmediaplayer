@@ -1,4 +1,5 @@
 import { VidstackPlayer, VidstackPlayerLayout } from 'https://cdn.vidstack.io/player'
+import { audio_error_handler } from './audio-error-handler.js'
 
 const css1 = document.createElement("link")
 css1.rel = "stylesheet"
@@ -49,6 +50,9 @@ const create_audioelem_vidstack = function(src, tags=null) {
   player.appendChild(provider)
   player.appendChild(layout)
   player.id = "MediaPlayer"
+  player.addEventListener("error", e => {
+    audio_error_handler({target: {error: e.detail, src: player.setAttribute.currentSrc || player.src}})
+  })
 
   player.letsPlay = async function() {
     if (!player.setAttribute.canPlay) {

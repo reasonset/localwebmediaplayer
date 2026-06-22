@@ -1,4 +1,5 @@
 import 'https://cdn.plyr.io/3.8.4/plyr.js'
+import { audio_error_handler } from './audio-error-handler.js'
 
 const plyr_css = document.createElement("link")
 plyr_css.rel = "stylesheet"
@@ -30,6 +31,7 @@ const create_videoelem_plyr = function(src, tags=null) {
 
 const create_audioelem_plyr = function(src, tags=null) {
   const player_raw = document.createElement("audio")
+  player_raw.addEventListener("error", audio_error_handler)
   const dummy = document.createElement("div")
   dummy.appendChild(player_raw)
 
