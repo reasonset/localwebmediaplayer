@@ -1,32 +1,21 @@
-import {http} from '/httpclient.mjs'
+import { http } from '/httpclient.mjs'
+import { audio_error_handler } from './audio-error-handler.js'
+import { msg_show } from './msgwindow.js'
+import { currentState } from './current_state.js'
 
 var playlist = []
-var currentState = {
-  filelist: [],
-  playlist_index: -1,
-  mediatype: null,
-  path: null,
-  scroll_position: {},
-  viewportX: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
-  cover: null,
-  imglist: [],
-  bookreader: {
-    spread: true,
-    rtl: false,
-    current_page: null,
-    shown: false,
-    force_single: false,
-    preload_strategy: {fetch: "ahead", cache: "once"},
-    prefetched_urls: new Set(),
-    prefetched_images: new Map(),
-  },
-  currentView: null,
-  systemInfo: null,
-  metadata: {}
-}
 
 const mediaURI = function (path) {
-  return "/media/" + encodeURIComponent(path)
+  const origin = "/media/" + path.split("/").map(encodeURIComponent).join("/")
+  if (currentState.transcode[origin]) {
+    return currentState.transcode[origin]
+  } else {
+    return origin
+  }
+}
+
+const thumbURI = function (path) {
+  return "/transcode/thumb/" + path.split("/").map(encodeURIComponent).join("/") + ".thumb.webp"
 }
 
 // Lazy image load observer
@@ -34,16 +23,18 @@ const thumbnailObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const img = entry.target
-      const thumb = img.dataset.thumbnail
-      const temp_img = new Image()
-      temp_img.onload = () => {
-        img.src = thumb
-        img.className = "thumbnail"
+      if (img.dataset.thumbnail) {
+        const thumb = img.dataset.thumbnail
+        const temp_img = new Image()
+        temp_img.onload = () => {
+          img.src = thumb
+          img.className = "thumbnail"
+        }
+        temp_img.onerror = () => {
+          console.warn('Thumbnail load failed for:', thumb)
+        }
+        temp_img.src = thumb
       }
-      temp_img.onerror = () => {
-        console.warn('Thumbnail load failed for:', thumb)
-      }
-      temp_img.src = thumb
       observer.unobserve(img)
     }
   })
@@ -98,6 +89,18 @@ const setupSystemInfo = function(env) {
       break
     default:
       void 0
+  }
+
+  // Get transcode data list
+  getTranscodeInfo()
+}
+
+const getTranscodeInfo = async function() {
+  try {
+    const result = await http.get("/info/transcode_meta.json")
+    currentState.transcode = result
+  } catch(e) {
+    void 0
   }
 }
 
@@ -159,8 +162,8 @@ const load_browser = async function(path) {
     fii.className = i.type
     const fiii = document.createElement("img")
     fiii.src = `/img/${i.type}.svg`
-    if (currentState.systemInfo.use_thumbnail && ["video", "music", "image"].includes(i.type)) {
-      fiii.dataset.thumbnail = `/thumb/${encodeURIComponent(i.path)}.thumb.webp`
+    if (currentState.systemInfo.use_thumbnail && i.thumbnail && ["video", "music", "image"].includes(i.type)) {
+      fiii.dataset.thumbnail = thumbURI(i.path)
       fiii.className = "svgicon lazy-thumb"
     } else {
       fiii.className = "svgicon"
@@ -244,6 +247,7 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.preload = "auto"
   media_div.letsPlay = media_div.play
   media_div.updateSrc = (src, tags) => { media_div.src = src }
+  media_div.addEventListener("error", audio_error_handler)
   return media_div
 }
 
@@ -350,7 +354,7 @@ const load_player = function(playlist_item, options={}) {
   }
 
   if (sametype) {
-    media_div.updateSrc(mediaURI(playlist_item.path), currentState.metadata[playlist_item.path].tags)
+    media_div.updateSrc(mediaURI(playlist_item.path), (currentState.metadata[playlist_item.path]?.tags || {}))
   } else {
     const player_div = document.getElementById("MediaPlayer")
     media_div.addEventListener("ended", e => {
@@ -842,22 +846,6 @@ const bookreader = {
     this.draw(Number(target_page) - 1)
     e.preventDefault()
   }
-}
-
-const msg_show = function(text, type="info") {
-  const box = document.getElementById("MsgBox")
-  box.innerText = text
-  if (type === "err") {
-    box.className = "msgshow_err"
-  } else {
-    box.className = "msgshow_info"
-  }
-
-  setTimeout(
-    ()=> {
-      box.className = "msghide"
-    }, 3000
-  )
 }
 
 const show_progress = function() {

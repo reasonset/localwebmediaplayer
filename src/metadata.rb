@@ -1,9 +1,10 @@
 #!/bin/env ruby
+require 'yaml'
 require 'json'
 require 'gdbm'
 require 'fileutils'
 
-$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolized_names: true)
+$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolize_names: true)
 
 class LWMPMetadata
   IMAGE_MIME = {

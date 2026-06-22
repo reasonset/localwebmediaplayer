@@ -2,12 +2,12 @@
 require 'uri'
 require 'json'
 require 'yaml'
-require 'rscgi'
+require_relative 'rscgi'
 
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
 
-$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolized_names: true)
+$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolize_names: true)
 
 module DirList
   class BadRequest < StandardError
@@ -22,6 +22,10 @@ module DirList
   # .heif .jxl
   MEDIA_EXT_TXT = %w:.txt .xml .html .xhtml .css .json .yaml .yml .toml .md .rst .t2t .wiki:
   MEDIA_EXT_EXT = %w:.pdf:
+
+  def thumbnail_exist? path, fn
+    File.exist? File.join($config[:thumb_root], path, fn + ".thumb.webp")
+  end
 
   def dir path
     path = nil if path && path.empty?
@@ -54,19 +58,22 @@ module DirList
           files["file"].push({
             "type" => "video",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_AUD.include? ext.downcase
           files["file"].push({
             "type" => "music",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_IMG.include? ext.downcase
           files["file"].push({
             "type" => "image",
             "path" => (path ? File.join(path, fn) : fn),
-            "ext" => ext
+            "ext" => ext,
+            "thumbnail" => thumbnail_exist?(path, fn)
           })
         elsif MEDIA_EXT_TXT.include? ext.downcase
           files["file"].push({

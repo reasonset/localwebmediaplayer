@@ -38,12 +38,13 @@ spec["data_root"] = spec["data_root"].sub(%r:/$:, "") + "/"
 spec["cache_root"] or abort "Key 'cache_root' is not found."
 spec["cache_root"] = spec["cache_root"].sub(%r:/$:, "") + "/"
 spec["thumb_root"] = File.join(spec["cache_root"], "thumb") # For compatibility.
-spec["meta_root"] = spec["metadata"] && (spec["metadata"].sub(%r:/$:, "") + "/")
+spec["meta_root"] = File.join(spec["data_root"], "metadata")
 spec["instance_name"] = spec["name"] || profile
 spec["ffprobe"] = config["ffprobe"] || "ffprobe"
+spec["exclude_exts"] ||= []
 
 ENV["REPO_DIR"] = config["repo"]
-ENV["MEDIA_ROOT"] = spec["media"]
+ENV["MEDIA_ROOT"] = spec["media_root"]
 ENV["DATA_ROOT"] = spec["data_root"]
 ENV["CACHE_ROOT"] = spec["cache_root"]
 ENV["SERVER_PORT"] = (spec["port"] or abort "Key 'port' is not found.").to_s

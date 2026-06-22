@@ -109,7 +109,6 @@ The software has not been tested on other platforms.
 ## Install
 
 * Clone this repository to your local
-* `gem install rscgi` if it's not installed
 
 ## Configuration
 
@@ -122,7 +121,7 @@ In most cases, `lighttpd_cmd` does not need to be specified. You only need to se
 
 Individual instance settings should be written under the `profiles` section.  
 Each key in `profiles` represents a profile name, which is used at startup.  
-You must specify both the directory to browse (`media`) and the server port (`port`).
+You must specify both the directory to browse (`media`), cache (`cache_root`), variable data (`data_root`) and the server port (`port`).
 
 ## Usage
 
@@ -139,7 +138,7 @@ In that case, make sure to specify the `repo` setting in the configuration file.
 # Metadata function
 
 If the `use_metadata` parameter is set to true, metadata support is enabled.
-Metadata is stored in the directory specified by `metadata_dir`, which can be set in `config.rb` or via the `METADATA_DIR` environment variable.
+Metadata is stored in the directory `$data_root/metadata`.
 
 When enabled, clients will request metadata during playlist construction.
 A helper script (`metadata.rb`) utilizes `ffprobe` to extract media metadata and respond to the client accordingly.
@@ -159,7 +158,7 @@ Additionally, metadata integration enhances compatibility with OS-level mediaSes
 # Thumbnail function
 
 If the `use_thumbnail` parameter is set to true, the metadata feature is enabled.
-Metadata is stored in the directory specified by `thumb_dir`. `thumb_dir` can be set in `config.rb` or via the `THUMB_DIR` environment variable.
+Metadata is stored in the directory `$cache_root/thumb`.
 
 This thumbnail directory must be accessible to clients via `/thumb/`.
 
@@ -172,6 +171,20 @@ create-thumbnail.rb <media_dir> <thumb_dir>
 If `use_thumbnail` is true, the client uses a intersection observer to monitor the file browser and replaces the icon with a thumbnail when the target entry is displayed on the screen.
 
 While this alleviates some of the pressure on the rate limit, a large number of requests may still be expected depending on the environment, so you may need to set a more lenient rate limit for the number of requests.
+
+# Audio file fallback
+
+Audio playback in web browsers can fail for various reasons. This can occur even when there are no issues with standard audio player applications, and it is particularly common in mobile environments.
+
+LWMP uses batch processing to provide fallback audio files that can be used instead.
+
+If `report_decode_error` is enabled, the client notifies the server of any files that failed to play. The server stores this information in a list, and `create-transcode.rb` can be used to generate fallback files.
+
+```
+create-transcode.rb <media_root> <cache_root> <data_root>
+```
+
+Fallback files are loaded even if `report_decode_error` is disabled.
 
 # Video Player / Audio Player with Library
 
@@ -241,7 +254,7 @@ To execute a CGI script via `mise`, prepare a script like the one below so that 
 exec mise exec ruby@4.0 -- ruby "$@"
 ```
 
-Then, grant this file execute permissions and specify it using the absolute path in the Lighttpd CGI handler.
+Then, grant this file execute permissions and specify it using the absolute path in `ruby` setting.
 
 # Windows Support
 
@@ -383,4 +396,4 @@ Icon files are located in the `src/img` directory. The corresponding Feather Ico
 # Other softwares
 
 * `httpclient.mjs` from [fetchwrapper](https://github.com/reasonset/fetchwrapper) ([Apache License 2.0](https://github.com/reasonset/fetchwrapper/blob/master/LICENSE))
-
+* `rscgi.rb` from [rscgi](https://github.com/reasonset/rscgi) ([MIT LICENSE](https://github.com/reasonset/rscgi/blob/master/LICENSE))
