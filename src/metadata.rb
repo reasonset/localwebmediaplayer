@@ -2,7 +2,8 @@
 require 'json'
 require 'gdbm'
 require 'fileutils'
-require_relative 'config'
+
+$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolized_names: true)
 
 class LWMPMetadata
   IMAGE_MIME = {

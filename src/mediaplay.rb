@@ -1,11 +1,13 @@
 #!/bin/env ruby
 require 'uri'
 require 'json'
+require 'yaml'
 require 'rscgi'
-require_relative 'config'
 
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
+
+$config ||= YAML.load(ENV["CONFIG_PROFILE"], symbolized_names: true)
 
 module DirList
   class BadRequest < StandardError
@@ -47,8 +49,7 @@ module DirList
         files["cover"] ||= (path ? File.join(path, fn) : fn)
       elsif stat.file? || File.file?(File.realpath(File.join(dirpath, fn)))
         ext = File.extname(fn)
-        exclude_exts = (ENV["EXCLUDE_EXTS"] || "").downcase.split(";")
-        next if exclude_exts.any? {|xext| fn[-(xext.length)..] == xext}
+        next if $config[:exclude_exts].any? {|xext| fn[-(xext.length)..] == xext}
         if MEDIA_EXT_VID.include? ext.downcase
           files["file"].push({
             "type" => "video",
@@ -150,7 +151,8 @@ class MediaPlayer
         "use_metadata" => $config[:use_metadata],
         "use_thumbnail" => $config[:use_thumbnail],
         "videoplayer" => $config[:videoplayer],
-        "audioplayer" => $config[:audioplayer]
+        "audioplayer" => $config[:audioplayer],
+        "report_decode_error" => $config[:report_decode_error]
       }
     end
   end

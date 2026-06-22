@@ -1,5 +1,19 @@
 # Version 1
 
+## v1.5.0
+
+**IMCOMPATIBLE CHANGES**
+
+* Settings are now passed to environment variables as YAML strings via `lwmp-start.rb`.
+  * As a result, `config.rb` is no longer needed.
+  * The way some settings are specified has changed; values that should be Boolean are now passed as actual Boolean values rather than strings like “no”.
+  * Instead of specifying `exclude` as a string, you must now pass an array as the `exclude_exts` entry.
+  * It is now effectively mandatory to use `lwmp-start.rb` to start the service.
+  * You no longer need to update the Lighttpd configuration file when new configuration values are added.
+* Add report decoding error and batch cli.
+* The `thumb` configuration option has been removed.
+  * It has been merged into `cache_root`, and `$cache_root/thumb` is now used instead. Clients now use `/transcode/thumb` instead.
+
 ## v1.4.3 (2026-06-07)
 
 * Revert to 1.4.1

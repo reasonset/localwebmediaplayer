@@ -1,6 +1,7 @@
 $config = {
   use_metadata: !["false", "no", "disable"].include?(ENV["USE_METADATA"]),
   use_thumbnail: !["false", "no", "disable"].include?(ENV["USE_THUMBNAIL"]),
+  report_decode_error: !["false", "no", "disable"].include?(ENV["REPORT_DECORD_ERROR"]),
   ffprobe_cmd: "ffprobe",
   videoplayer: ENV["VIDEOPLAYER"] || "default", # vidstack, vlitejs, plyr, fluid, default
   audioplayer: ENV["AUDIOPLAYER"] || "default", # vidstack, vlitejs, plyr, default
