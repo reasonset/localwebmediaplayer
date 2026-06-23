@@ -24,7 +24,10 @@ module DirList
   MEDIA_EXT_EXT = %w:.pdf:
 
   def thumbnail_exist? path, fn
-    File.exist? File.join($config[:thumb_root], path, fn + ".thumb.webp")
+    path_elem = [$config[:thumb_root]]
+    path_elem.push(path) if path
+    path_elem = fn + ".thumb.webp"
+    File.exist? File.join(*path_elem)
   end
 
   def dir path
