@@ -1,5 +1,9 @@
 # Version 2
 
+## v2.0.1 (2026-06-23)
+
+* Fix bug: Error on thumbnailable media in root
+
 ## v2.0.0 (2026-06-22)
 
 **IMCOMPATIBLE CHANGES**
