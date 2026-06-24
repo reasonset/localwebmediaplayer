@@ -3,8 +3,6 @@ import { audio_error_handler } from './audio-error-handler.js'
 import { msg_show } from './msgwindow.js'
 import { currentState } from './current_state.js'
 
-var playlist = []
-
 const mediaURI = function (path) {
   const origin = "/media/" + path.split("/").map(encodeURIComponent).join("/")
   if (currentState.transcode[origin]) {
@@ -235,6 +233,8 @@ const create_videoelem_vanilla = function(src, tags=null) {
   media_div.controls = true
   media_div.preload = "auto"
   media_div.letsPlay = media_div.play
+  media_div.handlePlay = media_div.play
+  media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   return media_div
 }
@@ -246,6 +246,8 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.controls = true
   media_div.preload = "auto"
   media_div.letsPlay = media_div.play
+  media_div.handlePlay = media_div.play
+  media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   media_div.addEventListener("error", audio_error_handler)
   return media_div
@@ -254,8 +256,37 @@ const create_audioelem_vanilla = function(src, tags=null) {
 var create_videoelem = create_videoelem_vanilla
 var create_audioelem = create_audioelem_vanilla
 
+const update_trackcontrol = function() {
+  navigator.mediaSession?.setActionHandler('nexttrack', (currentState.playlist[currentState.playlist_index + 1]) ? (e => {
+    playlist_next()
+  }) : null)
+
+  navigator.mediaSession?.setActionHandler('previoustrack', (currentState.playlist_index > 0) ? (e => {
+    playlist_prev()
+  }) : null)
+}
+
+const enblae_playcontrol = function() {
+  navigator.mediaSession?.setActionHandler('play', e => {
+    const media_div = document.getElementById("MediaPlayer")
+    media_div.handlePlay()
+  })
+
+  navigator.mediaSession?.setActionHandler('pause', e => {
+    const media_div = document.getElementById("MediaPlayer")
+    media_div.handlePause()
+  })
+}
+
+const disable_playcontrol = function() {
+  navigator.mediaSession?.setActionHandler('play', null)
+  navigator.mediaSession?.setActionHandler('pause', null)
+  navigator.mediaSession?.setActionHandler('nexttrack', null)
+  navigator.mediaSession?.setActionHandler('previoustrack', null)
+}
+
 const set_playlist = async function(type, pathes) {
-  playlist = []
+  currentState.playlist = []
   const ple = document.createElement("div")
   ple.id = "PlayList"
   if (currentState.systemInfo.use_metadata) {
@@ -275,7 +306,7 @@ const set_playlist = async function(type, pathes) {
   }
   for (let i=0; i < pathes.length; i++) {
     let acttype = type || get_type_from_ext(pathes[i].replace(/.*\./, ""))
-    playlist.push({
+    currentState.playlist.push({
       path: pathes[i],
       index: i,
       type: acttype,
@@ -293,13 +324,13 @@ const set_playlist = async function(type, pathes) {
     li.addEventListener("click", e => {
       if (!type) {
         if (acttype === "video" || acttype === "music") {
-          load_player(playlist[i], {keep_cover: true})
+          load_player(currentState.playlist[i], {keep_cover: true})
         } else {
           // skip playlist
           return
         }
       } else {
-        load_player(playlist[i], {keep_cover: true})
+        load_player(currentState.playlist[i], {keep_cover: true})
       }
     })
   }
@@ -358,9 +389,10 @@ const load_player = function(playlist_item, options={}) {
   } else {
     const player_div = document.getElementById("MediaPlayer")
     media_div.addEventListener("ended", e => {
-      if (currentState.playlist_index + 1 < playlist.length) {
-        load_player(playlist[currentState.playlist_index + 1], {cover: options.cover})
+      if (currentState.playlist_index + 1 < currentState.playlist.length) {
+        load_player(currentState.playlist[currentState.playlist_index + 1], {cover: options.cover})
       } else {
+        disable_playcontrol()
         msg_show("Playback complete.")
       }
     })
@@ -372,12 +404,19 @@ const load_player = function(playlist_item, options={}) {
       navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags)
     }
   })
+
+  // Handle mediaSession.setActionHandler()
+  update_trackcontrol()
+  if (!currentState.player_exist) {
+    enblae_playcontrol()
+    currentState.player_exist = true
+  }
 }
 
 const file_click = async function(target, type) {
   if (type === "list") {
     await set_playlist(null, target.playlist)
-    load_player(playlist[0])
+    load_player(currentState.playlist[0])
     switch_player_with_state()
   } else {
     single_play(target.dataset.filePath, type)
@@ -393,7 +432,7 @@ const single_play = async function(path, type) {
     open(mediaURI(path))
   } else if (type === "music" || type === "video") {
     await set_playlist(type, [path])
-    load_player(playlist[0])
+    load_player(currentState.playlist[0])
     switch_player_with_state()
   }
 }
@@ -410,7 +449,7 @@ const play_all_videos = async function() {
     return
   }
   await set_playlist("video", list)
-  load_player(playlist[0])
+  load_player(currentState.playlist[0])
   switch_player_with_state()
 }
 
@@ -426,19 +465,19 @@ const play_all_audio = async function() {
     return
   }
   await set_playlist("music", list)
-  load_player(playlist[0], {cover: currentState.cover})
+  load_player(currentState.playlist[0], {cover: currentState.cover})
   switch_player_with_state()
 }
 
 const playlist_prev = function(e) {
   if (currentState.playlist_index > 0) {
-    load_player(playlist[currentState.playlist_index - 1], {keep_cover: true})
+    load_player(currentState.playlist[currentState.playlist_index - 1], {keep_cover: true})
   }
 }
 
 const playlist_next = function(e) {
-  if (currentState.playlist_index < playlist.length) {
-    load_player(playlist[currentState.playlist_index + 1], {keep_cover: true})
+  if (currentState.playlist_index < currentState.playlist.length) {
+    load_player(currentState.playlist[currentState.playlist_index + 1], {keep_cover: true})
   }
 }
 
@@ -992,16 +1031,6 @@ document.getElementById("BookReaderOptionPreloadPageSubmit").addEventListener("c
   if (value[0] == "greedy") {
     await bookreader.prefetch_cache_greedy()
   }
-})
-
-
-// Media key
-navigator.mediaSession?.setActionHandler('nexttrack', e => {
-  playlist_next()
-})
-
-navigator.mediaSession?.setActionHandler('previoustrack', e => {
-  playlist_prev()
 })
 
 // Back navigation

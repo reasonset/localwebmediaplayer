@@ -200,11 +200,18 @@ Use vidstack. The library is loaded from a CDN.
 
 vidstack enables users to fast-forward and rewind videos using the keyboard.
 
+Vidstack sometimes has trouble loading content from the CDN.
+Since this is an issue on Vidstack's end, LWMP cannot resolve it.
+
 ## vlitejs
 
 Use vLiteJS. The library is loaded from a CDN.
 
 The volume bar and hotkey plugins are enabled.
+
+vLiteJS is more likely than other players to have issues with autoplay.
+
+Media key controls for play and pause are disabled in vLiteJS. This is because enabling them causes the player to malfunction and triggers other issues.
 
 ## plyr
 
@@ -219,6 +226,8 @@ Plyr has other issues as well, so it may no longer be supported in the future.
 Use Fluid Player. The library is loaded from a CDN.
 
 Since Fluid Player does not provide an interface for use in place of the `audio` element, you cannot specify `fluid` as the value for `audioplayer`.
+
+Fluid Player ensures that even landscape-oriented videos maintain their maximum height (70vh). This is a known issue, but since fixing it could cause the video to be cut off depending on the video and viewport sizes, there are no plans to fix it.
 
 # Manual Deployment of the Web Application
 

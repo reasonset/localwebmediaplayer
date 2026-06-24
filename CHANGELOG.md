@@ -1,5 +1,11 @@
 # Version 2
 
+## v2.1.0
+
+* Improve mediaSession action handler
+  * It might also help alleviate the issue of apps being force-closed on mobile devices to some extent.
+  * The `play()` and `pause()` methods have also been implemented, but they do not work if you are using vLiteJS.
+
 ## v2.0.1 (2026-06-23)
 
 * Fix bug: Error on thumbnailable media in root
