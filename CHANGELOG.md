@@ -1,6 +1,6 @@
 # Version 2
 
-## v2.1.0
+## v2.1.0 (2026-06-25)
 
 * Improve mediaSession action handler
   * It might also help alleviate the issue of apps being force-closed on mobile devices to some extent.
