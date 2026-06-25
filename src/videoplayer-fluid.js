@@ -39,6 +39,8 @@ const create_videoelem_fluid = function(src, tags=null) {
   const fec = dummy.firstElementChild
   fec.classList.add("video_player_box")
   fec.letsPlay = async () => { media_div.play() }
+  fec.handlePlay = async () => { media_div.play() }
+  fec.handlePause = async () => { media_div.pause() }
   fec.updateSrc = (src, tags) => { player_raw.src = src }
   fec.id = "MediaPlayer"
 

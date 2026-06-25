@@ -1,5 +1,6 @@
 const currentState = {
   filelist: [],
+  playlist: [],
   playlist_index: -1,
   mediatype: null,
   path: null,
@@ -21,7 +22,8 @@ const currentState = {
   currentView: null,
   systemInfo: null,
   metadata: {},
-  transcode: {}
+  transcode: {},
+  player_exist: false
 }
 
 export {currentState}
