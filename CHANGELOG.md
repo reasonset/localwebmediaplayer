@@ -1,5 +1,10 @@
 # Version 2
 
+## v2.1.1 (2026-08-10)
+
+* Fix next playlist item on ended
+* Fix thumbnail path bug
+
 ## v2.1.0 (2026-06-25)
 
 * Improve mediaSession action handler
