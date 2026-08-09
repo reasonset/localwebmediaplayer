@@ -391,7 +391,7 @@ const load_player = function(playlist_item, options={}) {
     media_div.updateSrc(mediaURI(playlist_item.path), (currentState.metadata[playlist_item.path]?.tags || {}))
   } else {
     const player_div = document.getElementById("MediaPlayer")
-    player_div.call_ended(e => {
+    media_div.call_ended(e => {
       if (currentState.playlist_index + 1 < currentState.playlist.length) {
         load_player(currentState.playlist[currentState.playlist_index + 1], {cover: options.cover})
       } else {
