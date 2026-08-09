@@ -250,6 +250,9 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   media_div.addEventListener("error", audio_error_handler)
+  media_div.call_ended(callback => {
+    media_div.addEventListener("ended", callback)
+  })
   return media_div
 }
 
@@ -388,7 +391,7 @@ const load_player = function(playlist_item, options={}) {
     media_div.updateSrc(mediaURI(playlist_item.path), (currentState.metadata[playlist_item.path]?.tags || {}))
   } else {
     const player_div = document.getElementById("MediaPlayer")
-    media_div.addEventListener("ended", e => {
+    player_div.call_ended(e => {
       if (currentState.playlist_index + 1 < currentState.playlist.length) {
         load_player(currentState.playlist[currentState.playlist_index + 1], {cover: options.cover})
       } else {

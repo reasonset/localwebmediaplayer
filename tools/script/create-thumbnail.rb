@@ -38,6 +38,7 @@ Find.find(media_dir) do |fp|
     system("ffmpeg", "-i", fp, "-vf", "scale=300:300:force_original_aspect_ratio=decrease", efp)
   when MEDIA_EXT_IMG.include?(ext)
     next unless mime == "image"
+    $stderr.puts("Image thumbnail for: #{fp}")
     system("magick", fp, "-resize", "300x300>", "-strip", efp)
   end
 end
