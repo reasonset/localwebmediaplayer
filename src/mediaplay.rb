@@ -26,7 +26,7 @@ module DirList
   def thumbnail_exist? path, fn
     path_elem = [$config[:thumb_root]]
     path_elem.push(path) if path
-    path_elem = fn + ".thumb.webp"
+    path_elem.push(fn + ".thumb.webp")
     File.exist? File.join(*path_elem)
   end
 

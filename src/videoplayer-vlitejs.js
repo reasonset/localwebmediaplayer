@@ -45,6 +45,10 @@ const create_videoelem_vlitejs = function(src, tags=null) {
   fec.updateSrc = (src, tags) => { player_raw.src = src }
   fec.id = "MediaPlayer"
 
+  fec.call_ended = callback => {
+    player_raw.addEventListener("ended", callback)
+  }
+
   return fec
 }
 
@@ -71,6 +75,10 @@ const create_audioelem_vlitejs = function(src, tags=null) {
   fec.updateSrc = (src, tags) => { player_raw.src = src }
   fec.id = "MediaPlayer"
   fec.classList.add("vlitejs-audio-box")
+
+  fec.call_ended = callback => {
+    player_raw.addEventListener("ended", callback)
+  }
 
   return fec
 }
