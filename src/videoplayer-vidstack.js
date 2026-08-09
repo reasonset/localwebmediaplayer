@@ -40,9 +40,9 @@ const create_videoelem_vidstack = function(src, tags=null) {
     player.title = tags?.title
     player.src = src
   }
-  player.call_ended(callback => {
+  player.call_ended = callback => {
     player.addEventListener("ended", callback)
-  })
+  }
   return player
 }
 
@@ -73,9 +73,9 @@ const create_audioelem_vidstack = function(src, tags=null) {
     player.title = tags?.title
     player.src = src
   }
-  player.call_ended(callback => {
+  player.call_ended = callback => {
     player.addEventListener("ended", callback)
-  })
+  }
   return player
 }
 

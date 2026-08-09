@@ -236,6 +236,9 @@ const create_videoelem_vanilla = function(src, tags=null) {
   media_div.handlePlay = media_div.play
   media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
+  media_div.call_ended = callback => {
+    media_div.addEventListener("ended", callback)
+  }
   return media_div
 }
 
@@ -250,9 +253,9 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   media_div.addEventListener("error", audio_error_handler)
-  media_div.call_ended(callback => {
+  media_div.call_ended = callback => {
     media_div.addEventListener("ended", callback)
-  })
+  }
   return media_div
 }
 
