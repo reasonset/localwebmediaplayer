@@ -1,5 +1,9 @@
 # Version 2
 
+## V2.2.0 (2026-08-12)
+
+* (Metadata) Use `.info.json` file if exists.
+
 ## v2.1.1 (2026-08-10)
 
 * Fix next playlist item on ended

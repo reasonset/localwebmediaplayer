@@ -48,9 +48,31 @@ class LWMPMetadata
   end
 
   def load_meta path
-    result = nil
     filepath = [@root, path].join("/")
     return nil unless File.exist? filepath
+    load_meta_infojson(filepath) || load_meta_ffprobe(filepath)
+  end
+
+  def load_meta_infojson filepath
+    stripped = filepath.sub(/\.[a-zA-Z0-9]+$/, "")
+    info_json_path = stripped + ".info.json"
+    if File.exist?(info_json_path)
+      info_json = JSON.load File.read info_json_path
+      return({
+        "tags" => {
+          "title" => info_json["title"],
+          "artist" => info_json["channel"],
+          "album" => info_json["uploader"]
+        }
+      })
+    end
+    nil
+  rescue
+    return nil
+  end
+
+  def load_meta_ffprobe filepath
+    result = nil
     IO.popen([@ffprobe, "-of", "json", "-show_format", "-show_streams", filepath], external_encoding: "UTF-8") do |io|
       idata = io.read
       data = JSON.load idata
