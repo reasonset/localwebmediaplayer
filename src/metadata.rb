@@ -50,7 +50,7 @@ class LWMPMetadata
   def load_meta path
     filepath = [@root, path].join("/")
     return nil unless File.exist? filepath
-    load_meta_infojson || load_meta_ffprobe
+    load_meta_infojson(filepath) || load_meta_ffprobe(filepath)
   end
 
   def load_meta_infojson filepath
