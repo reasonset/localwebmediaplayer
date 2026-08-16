@@ -1,5 +1,9 @@
 # Version 2
 
+## v2.2.1 (2026-08-16)
+
+* Fix bug in new metadata support.
+
 ## V2.2.0 (2026-08-12)
 
 * (Metadata) Use `.info.json` file if exists.

@@ -50,7 +50,7 @@ class LWMPMetadata
   def load_meta path
     filepath = [@root, path].join("/")
     return nil unless File.exist? filepath
-    load_meta_infojson(filepath) || load_meta_ffprobe(filepath)
+    load_meta_infojson(filepath) || load_meta_ffprobe(path, filepath)
   end
 
   def load_meta_infojson filepath
@@ -71,7 +71,7 @@ class LWMPMetadata
     return nil
   end
 
-  def load_meta_ffprobe filepath
+  def load_meta_ffprobe path, filepath
     result = nil
     IO.popen([@ffprobe, "-of", "json", "-show_format", "-show_streams", filepath], external_encoding: "UTF-8") do |io|
       idata = io.read
