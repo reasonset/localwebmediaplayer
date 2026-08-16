@@ -1,5 +1,9 @@
 # Version 2
 
+## v2.3.0 (2026-08-17)
+
+* Stop using `canvas` in the book reader and switch to drawing directly with `img`
+
 ## v2.2.1 (2026-08-16)
 
 * Fix bug in new metadata support.

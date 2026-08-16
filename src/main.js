@@ -760,7 +760,7 @@ const bookreader = {
     }
   },
 
-  async draw_page_spread({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page}) {
+  async draw_page_spread({pagenum, container, page}) {
     if (page > currentState.imglist.length - 2) { page = currentState.imglist.length - 2 }
     const img1 = this.img(page)
     const img2 = this.img(page + 1)
@@ -770,61 +770,47 @@ const bookreader = {
     await img1.decode()
     await img2.decode()
 
-    const aspect1 = img1.width / img1.height
-    const aspect2 = img2.width / img2.height
+    const aspect1 = img1.naturalWidth / img1.naturalHeight
+    const aspect2 = img2.naturalWidth / img2.naturalHeight
 
     if (aspect1 > 1 || aspect2 > 1) {
       currentState.bookreader.force_single = true
-      this.draw_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+      this.draw_page_single({pagenum, container, page})
       return
     } else {
       currentState.bookreader.force_single = false
     }
 
-    const targetHeight = maxHeight
-    const drawWidth1 = targetHeight * aspect1
-    const drawWidth2 = targetHeight * aspect2
+    container.replaceChildren()
+    container.className = "book-spread"
 
-    let fitScale = 1
-    if (drawWidth1 > (maxWidth / 2) || drawWidth2 > (maxWidth / 2)) {
-      fitScale = Math.min(((maxWidth / 2) / drawWidth1), ((maxWidth / 2) / drawWidth2))
-    }
+    const wrapper = document.createElement("div")
+    wrapper.className = "book-spread-wrapper"
+    wrapper.style.flexDirection = currentState.bookreader.rtl ? "row-reverse" : "row"
 
-    const finalHeight = targetHeight * fitScale / scale
-    const finalWidth1 = drawWidth1 * fitScale / scale
-    const finalWidth2 = drawWidth2 * fitScale / scale
+    img1.style = ""
+    img2.style = ""
 
-    const centerX = rect.width / 2
-    const x1 = currentState.bookreader.rtl ? centerX : centerX - finalWidth1
-    const y1 = (rect.height - finalHeight) / 2
-    const y2 = y1
-    const x2 = currentState.bookreader.rtl ? centerX - finalWidth2 : centerX
-
-    ctx.drawImage(img1, x1, y1, finalWidth1, finalHeight)
-    ctx.drawImage(img2, x2, y2, finalWidth2, finalHeight)
+    wrapper.appendChild(img1)
+    wrapper.appendChild(img2)
+    container.appendChild(wrapper)
 
     currentState.bookreader.page = page
     pagenum.value = page + 1
   },
 
-  async draw_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page}) {
+  async draw_page_single({pagenum, container, page}) {
     if (page > currentState.imglist.length - 1) { page = currentState.imglist.length - 1 }
     const img = this.img(page)
 
     this.prefetch(page)
 
     img.decode().then(() => {
-      const hScale = maxHeight / img.height
-      const wScale = maxWidth / img.width
-      const iscale = Math.min(hScale, wScale)
-      const drawWidth = img.width * iscale / scale
-      const drawHeight = img.height * iscale / scale
-
-      const y = (rect.height - drawHeight) / 2
-      const centerX = rect.width / 2
-      const x = centerX - (drawWidth / 2)
-      ctx.drawImage(img, x, y, drawWidth, drawHeight)
-
+      container.replaceChildren()
+      container.className = ""
+  
+      container.appendChild(img)
+  
       currentState.bookreader.page = page
       pagenum.value = page + 1
     })
@@ -832,26 +818,15 @@ const bookreader = {
 
   draw(page=0) {
     const pagenum = document.getElementById("BookReaderPageNumber")
-    const canvas = document.getElementById("BookReaderCanvas")
-    const ctx = canvas.getContext("2d")
-    const scale = window.devicePixelRatio
-
-    const desired_height = window.innerHeight
-    canvas.style.height = desired_height + "px"
-    const rect = canvas.getBoundingClientRect()
-    const maxWidth = rect.width * scale
-    const maxHeight = rect.height * scale
-    canvas.width = maxWidth
-    canvas.height = maxHeight
-    ctx.scale(scale, scale)
+    const container = document.getElementById("BookReaderImages")
 
     if (page < 0) { page = 0 }
 
     currentState.force_single = false
     if (currentState.bookreader.spread) {
-      this.draw_page_spread({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+      this.draw_page_spread({pagenum, container, page})
     } else {
-      this.draw_page_single({pagenum, canvas, ctx, scale, rect, maxWidth, maxHeight, page})
+      this.draw_page_single({pagenum, container, page})
     }
   },
 
