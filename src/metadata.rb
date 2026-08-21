@@ -76,7 +76,7 @@ class LWMPMetadata
     IO.popen([@ffprobe, "-of", "json", "-show_format", "-show_streams", filepath], external_encoding: "UTF-8") do |io|
       idata = io.read
       data = JSON.load idata
-      meta = data["format"]["tags"]
+      meta = data["format"]&.[]("tags") || data["streams"][0]&.[]("tags")
       return nil unless meta
 
       result = {
