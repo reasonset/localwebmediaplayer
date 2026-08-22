@@ -45,6 +45,10 @@ const create_videoelem_vidstack = function(src, tags=null) {
   player.updateSrc = function(src, tags=null) {
     canPlay = false
     player.title = tags?.title
+
+    // Vidstack's bug: Vidstack don't remove src when src type is already known.
+    provider.querySelector("audio")?.removeAttribute("src")
+
     player.src = src
   }
   player.call_ended = callback => {
@@ -86,6 +90,10 @@ const create_audioelem_vidstack = function(src, tags=null) {
   player.updateSrc = function(src, tags=null) {
     canPlay = false
     player.title = tags?.title
+
+    // Vidstack's bug: Vidstack don't remove src when src type is already known.
+    provider.querySelector("audio")?.removeAttribute("src")
+
     player.src = src
   }
   player.call_ended = callback => {
