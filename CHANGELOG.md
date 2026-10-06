@@ -1,5 +1,11 @@
 # Version 2
 
+## v2.4.0 (2026-10-06)
+
+* Add videojs support
+* Add fullscreen switch on Image Viewer and Book Reader
+* Improve Vidstack support
+
 ## v2.3.0 (2026-08-17)
 
 * Stop using `canvas` in the book reader and switch to drawing directly with `img`
