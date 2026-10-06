@@ -64,6 +64,11 @@ const setupSystemInfo = function(env) {
         create_videoelem = mod.create_videoelem_fluid
       })
       break
+    case 'videojs':
+      import("/videoplayer-videojs.js").then(mod => {
+        create_videoelem = mod.create_videoelem_videojs
+      })
+      break
     default:
       void 0
   }
@@ -85,12 +90,31 @@ const setupSystemInfo = function(env) {
         create_audioelem = mod.create_audioelem_plyr
       })
       break
+    case "videojs":
+      import("/videoplayer-videojs.js").then(mod => {
+        create_audioelem = mod.create_audioelem_videojs
+      })
+      break
     default:
       void 0
   }
 
   // Get transcode data list
   getTranscodeInfo()
+}
+
+const toggle_fullscreen = function(elem) {
+  if (document.fullscreenElement) {
+    document.exitFullscreen()
+  } else {
+    elem.requestFullscreen().catch((err) => {
+      console.error(`Error enabling fullscreen: ${err.message}`);
+    })
+  }
+}
+
+const exit_fullscreen = function() {
+  if (document.fullscreenElement) { document.exitFullscreen() }
 }
 
 const getTranscodeInfo = async function() {
@@ -407,7 +431,7 @@ const load_player = function(playlist_item, options={}) {
 
   media_div.letsPlay().then(() => {
     if (currentState.metadata[playlist_item.path]) {
-      navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags)
+      navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags || {})
     }
   })
 
@@ -572,7 +596,9 @@ const hide_imgview_callback = function(e) {
   const img = document.getElementById("ImgViewerFigure").firstChild
   const rect = img.getBoundingClientRect()
   const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
   const zone_width = rect.width / 3
+  const zone_height = rect.height / 5
 
   if (x < zone_width) {
     const index = currentState.imglist.indexOf(img.dataset.path)
@@ -580,7 +606,11 @@ const hide_imgview_callback = function(e) {
       switch_imgview(currentState.imglist[index - 1])
     }
   } else if (x < zone_width * 2) {
-    history.back()
+    if (y < zone_height) {
+      toggle_fullscreen(document.getElementById("ImgViewer"))
+    } else {
+      history.back()
+    }
   } else {
     const index = currentState.imglist.indexOf(img.dataset.path)
     if (index < currentState.imglist.length - 1) {
@@ -917,6 +947,7 @@ document.getElementById("BookReaderOptionModalBox").addEventListener("click", e 
 document.getElementById("BookReaderOptionModal").addEventListener("click", e => { e.stopPropagation() })
 document.getElementById("BookReaderOptionSpread").addEventListener("click", e => {bookreader.opt_spread(e)})
 document.getElementById("BookReaderOptionOrder").addEventListener("click", e => {bookreader.opt_rtl(e)})
+document.getElementById("BookReaderOptionFullscreen").addEventListener("click", e => {e.stopPropagation(); e.preventDefault(); toggle_fullscreen(document.getElementById("BookReaderBox"))})
 document.getElementById("BookReaderPageJump").addEventListener("click", e => {bookreader.opt_jump(e)})
 
 const upelem = document.getElementById("UpParent")
@@ -1028,9 +1059,11 @@ window.addEventListener("popstate", e => {
         break
       case "imgview":
         hide_imgview()
+        exit_fullscreen()
         break
       case "book":
         bookreader.hide()
+        exit_fullscreen()
         break
     }
     currentState.currentView = null

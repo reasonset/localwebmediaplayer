@@ -19,7 +19,7 @@ class LWMPMetadata
 
   def initialize
     @root = $config[:media_root]
-    @ffprobe = $config[:ffprobe_cmd] || "ffprobe"
+    @ffprobe = $config[:ffprobe] || "ffprobe"
     Encoding.default_external = "UTF-8"
   end
 
@@ -76,7 +76,7 @@ class LWMPMetadata
     IO.popen([@ffprobe, "-of", "json", "-show_format", "-show_streams", filepath], external_encoding: "UTF-8") do |io|
       idata = io.read
       data = JSON.load idata
-      meta = data["format"]["tags"]
+      meta = data["format"]&.[]("tags") || data["streams"][0]&.[]("tags")
       return nil unless meta
 
       result = {

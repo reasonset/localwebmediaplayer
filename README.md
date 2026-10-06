@@ -41,11 +41,12 @@ This software supports `.m3u` playlist *only* has relative path.
 
 Clicking an image file opens the image viewer.
 
-The viewer is divided into three zones: left, center, and right.
+The viewer is divided into four zones: left, center top, center low, and right.
 
 * Clicking the left zone shows the previous image
 * Clicking the right zone shows the next image
-* Clicking the center zone closes the viewer
+* Clicking the center top zone toggles full screen
+* Clicking the center low zone closes the viewer
 
 These zones are applied to the entire viewport of the image viewer, not to the image itself.
 
