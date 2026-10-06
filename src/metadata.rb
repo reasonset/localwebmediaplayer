@@ -19,7 +19,7 @@ class LWMPMetadata
 
   def initialize
     @root = $config[:media_root]
-    @ffprobe = $config[:ffprobe_cmd] || "ffprobe"
+    @ffprobe = $config[:ffprobe] || "ffprobe"
     Encoding.default_external = "UTF-8"
   end
 
