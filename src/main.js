@@ -274,7 +274,7 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.controls = true
   media_div.preload = "auto"
   media_div.autoplay = true
-  media_div.letsPlay = media_div.play.error(e => {
+  media_div.letsPlay = media_div.play().error(e => {
     msg_show(e, "err")
   })
   media_div.handlePlay = media_div.play().error(e => {
