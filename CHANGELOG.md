@@ -1,5 +1,9 @@
 # Version 2
 
+## v2.4.2 (2026-10-17)
+
+* Update videojs support
+
 ## v2.4.1 (2026-10-17)
 
 * Update videojs support
