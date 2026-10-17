@@ -274,13 +274,15 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.controls = true
   media_div.preload = "auto"
   media_div.autoplay = true
-  media_div.letsPlay = media_div.play
+  media_div.letsPlay = () => { media_div.play().error(e => {
+    msg_show(e, "err")
+  }) }
+  media_div.handlePlay = () => { media_div.play().error(e => {
+    msg_show(e, "err")
+  }) }
   media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   // media_div.addEventListener("error", audio_error_handler)
-  media_div.addEventListener("error", e => {
-    msg_show(e, "err")
-  })
   media_div.call_ended = callback => {
     media_div.addEventListener("ended", callback)
   }
