@@ -13,6 +13,7 @@ const create_videoelem_videojs = function(src, tags=null) {
   skin.appendChild(video)
   player.appendChild(skin)
   player.id = "MediaPlayer"
+  player.classList.add("videojs-video-box")
   player.classList.add("video_player_box")
 
   player.call_ended = callback => {
@@ -27,7 +28,6 @@ const create_videoelem_videojs = function(src, tags=null) {
     video.src = src
   }
 
-  video.style = 'max-height: 70vh;'
   return player
 }
 

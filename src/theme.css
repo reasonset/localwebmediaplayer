@@ -103,6 +103,16 @@ body {
   height: auto;
 }
 
+#MediaPlayer.videojs-video-box video {
+  max-height: 70vh;
+}
+
+@media (display-mode: fullscreen) {
+  #MediaPlayer.videojs-video-box video {
+    max-height: none !important;
+  }
+}
+
 #Player audio {
   width: 100%;
 }
