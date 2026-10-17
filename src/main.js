@@ -274,12 +274,8 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.controls = true
   media_div.preload = "auto"
   media_div.autoplay = true
-  media_div.letsPlay = () => { media_div.play().catch(e => {
-    msg_show(e, "err")
-  }) }
-  media_div.handlePlay = () => { media_div.play().catch(e => {
-    msg_show(e, "err")
-  }) }
+  media_div.letsPlay = media_div.play
+  media_div.handlePlay = media_div.play
   media_div.handlePause = media_div.pause
   media_div.updateSrc = (src, tags) => { media_div.src = src }
   // media_div.addEventListener("error", audio_error_handler)
@@ -439,6 +435,8 @@ const load_player = function(playlist_item, options={}) {
     if (currentState.metadata[playlist_item.path]) {
       navigator.mediaSession.metadata = new MediaMetadata(currentState.metadata[playlist_item.path].tags || {})
     }
+  }).catch(e => {
+    msg_show(e, "err")
   })
 
   // Handle mediaSession.setActionHandler()
