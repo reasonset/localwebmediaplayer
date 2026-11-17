@@ -12,6 +12,11 @@ const mediaURI = function (path) {
   }
 }
 
+// Compare numeric elements in file name as number like Nemo
+// e.g. ["foo15", "foo100", "foo4"].sort(sortFiles) => foo4, foo15, foo100
+const sortfiles_collator = new Intl.Collator(undefined, { numeric: true })
+const sortFiles = (a, b) => sortfiles_collator.compare(a.path, b.path)
+
 const thumbURI = function (path) {
   return "/transcode/thumb/" + path.split("/").map(encodeURIComponent).join("/") + ".thumb.webp"
 }
@@ -138,7 +143,11 @@ const load_browser = async function(path) {
     msg_show("HTTP Error", "err")
     return
   }
-  currentState.filelist = result
+  currentState.filelist = {
+    ...result,
+    directory: result.directory.sort(sortFiles),
+    file: result.file.sort(sortFiles)
+  }
   build_imglist()
   thumbnailObserver.disconnect()
 
@@ -256,6 +265,7 @@ const create_videoelem_vanilla = function(src, tags=null) {
   media_div.src = src
   media_div.controls = true
   media_div.preload = "auto"
+  media_div.autoplay = true
   media_div.letsPlay = media_div.play
   media_div.handlePlay = media_div.play
   media_div.handlePause = media_div.pause
@@ -272,6 +282,7 @@ const create_audioelem_vanilla = function(src, tags=null) {
   media_div.src = src
   media_div.controls = true
   media_div.preload = "auto"
+  media_div.autoplay = true
   media_div.letsPlay = media_div.play
   media_div.handlePlay = media_div.play
   media_div.handlePause = media_div.pause

@@ -24,6 +24,14 @@ const create_videoelem_videojs = function(src, tags=null) {
     return video.play()
   }
 
+  player.handlePlay = async function() {
+    return video.play()
+  }
+
+  player.handlePause = async function() {
+    return video.play()
+  }
+
   player.updateSrc = function(src, tags=null) {
     video.src = src
   }
@@ -47,6 +55,14 @@ const create_audioelem_videojs = function(src, tags=null) {
   }
 
   player.letsPlay = async function() {
+    return audio.play()
+  }
+
+  player.handlePlay = async function() {
+    return audio.play()
+  }
+
+  player.handlePause = async function() {
     return audio.play()
   }
 

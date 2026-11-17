@@ -1,5 +1,17 @@
 # Version 2
 
+## v2.5.0 (2026-10-22)
+
+* Compare numeric elements in file name as number
+
+## v2.4.2 (2026-10-17)
+
+* Update videojs support
+
+## v2.4.1 (2026-10-17)
+
+* Update videojs support
+
 ## v2.4.0 (2026-10-06)
 
 * Add videojs support
